@@ -12,14 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 var fs = require('fs');
-/*
+
 fs.writeFile("./test", "Hey there!", function(err) {
     if(err) {
       return console.log(err);
     }
     console.log("The file was saved!");
 });
-*/
+
 
 var bot,
     Bot,

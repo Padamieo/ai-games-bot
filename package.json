@@ -2,9 +2,16 @@
   "name": "u-t-t-t-ley-butterly",
   "version": "0.0.1",
   "author": "Michaél Adam Lockwood",
+  "javaGame": "com.theaigames.tictactoe.Tictactoe",
+  "engineFolder": "ultimatetictactoe-engine",
   "private": true,
   "dependencies": {
-    "bower": "*"
+  },
+  "devDependencies": {
+    "bower": "*",
+    "grunt": "~0.4.5",
+    "load-grunt-tasks": "*",
+    "grunt-shell": "*"
   },
   "scripts": {
     "postinstall": "bower install"
