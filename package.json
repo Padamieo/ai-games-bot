@@ -1,0 +1,9 @@
+{
+  "name": "u-t-t-t-ley-butterly",
+  "version": "0.0.1",
+  "author": "Michaél Adam Lockwood",
+  "private": true,
+  "dependencies": {
+    "ultimatetictactoe-engine": "git+https://github.com/theaigames/ultimatetictactoe-engine"
+  }
+}
