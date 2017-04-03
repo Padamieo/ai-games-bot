@@ -1,0 +1,8 @@
+{
+  "name": "ultimatetictactoe-bower",
+  "version": "0.0.1",
+  "dependencies": {
+    "ultimatetictactoe-engine": "https://github.com/theaigames/ultimatetictactoe-engine.git"
+  },
+  "private": true
+}

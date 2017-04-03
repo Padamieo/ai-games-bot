@@ -4,6 +4,9 @@
   "author": "Michaél Adam Lockwood",
   "private": true,
   "dependencies": {
-    "ultimatetictactoe-engine": "git+https://github.com/theaigames/ultimatetictactoe-engine"
+    "bower": "*"
+  },
+  "scripts": {
+    "postinstall": "bower install"
   }
 }
