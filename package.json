@@ -4,14 +4,18 @@
   "author": "Michaél Adam Lockwood",
   "javaGame": "com.theaigames.tictactoe.Tictactoe",
   "engineFolder": "ultimatetictactoe-engine",
+  "outErr": "err.txt",
+  "outLog": "out.txt",
+  "debug": true,
+  "output": "../something.txt",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "bower": "*",
     "grunt": "~0.4.5",
-    "load-grunt-tasks": "*",
-    "grunt-shell": "*"
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-shell": "*",
+    "load-grunt-tasks": "*"
   },
   "scripts": {
     "postinstall": "bower install"

@@ -24,7 +24,7 @@ module.exports = function(grunt){
 			compare: {
 				command: [
 					'cd ./bower_components/'+pkg.engineFolder+'/',
-					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+'/BotStarter.js" "node '+thisUrl+'/BotStarter.js" 2>err.txt 1>out.txt'
+					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+'/BotStarter.js" "node '+thisUrl+'/BotStarter.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
 				].join('&&'),
         callback: function(err, stdout, stderr, cb) {
 					console.log("done");
@@ -32,17 +32,35 @@ module.exports = function(grunt){
         }
 			}
 
-		}
+		},
+
+    clean: {
+      log: {
+        src: ['output.txt']
+      },
+      engineOut: {
+        src: [
+          'bower_components/'+pkg.engineFolder+'/'+pkg.outErr,
+          'bower_components/'+pkg.engineFolder+'/'+pkg.outLog,
+        ]
+      }
+    }
 
 	});
 
 	// our default task, others will come later
 	grunt.registerTask("default", [
+    "clean:log",
 		"shell:compare"
   ]);
 
 	grunt.registerTask('setup', [
 		"shell:setup"
+	]);
+
+  grunt.registerTask('clear', [
+		"clean:log",
+    "clean:engineOut"
 	]);
 
 	grunt.registerTask('test', function(){
