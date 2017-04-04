@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 var fs = require('fs');
-var pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+//var pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 //may need to be some sort of promise
 pkg = {};
 pkg.debug = true;
@@ -104,11 +104,9 @@ Bot.prototype.run = function () {
  * @param Array data
  */
 Bot.prototype.settings = function (data) {
-    var key = data[0],
-        value = data[1];
-
-    // set key to value
-    this.options[key] = value;
+  var key = data[0], value = data[1];
+  // set key to value
+  this.options[key] = value;
 };
 
 Bot.prototype.action = function (data) {
@@ -123,11 +121,19 @@ Bot.prototype.action = function (data) {
 
     var action = "place_move " + move.x + ' ' + move.y;
 
-    //fs.appendFileSync(pkg.output, action+"\n");
+    var currentBoard = this.field.mBoard;
+    var breakdown = currentBoard.toString().split(/(.{18})/);
+
+    for (i = 0; i < breakdown.length; i++) {
+      var out = breakdown[i].toString();
+      if(out.length > 0){
+        fs.appendFileSync(pkg.output, out+"\n");
+      }
+    }
+
+    fs.appendFileSync(pkg.output, "--- "+action+ "\n\n");
 
     return action;
-  }else{
-    fs.appendFileSync(pkg.output, data[0]+"\n");
   }
 
 };

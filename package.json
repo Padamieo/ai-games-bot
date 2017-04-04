@@ -9,6 +9,7 @@
   "debug": true,
   "output": "../something.txt",
   "private": true,
+  "compare": "/bower_components/tictactoe-starterbot-js/BotStarter.js",
   "dependencies": {},
   "devDependencies": {
     "bower": "*",

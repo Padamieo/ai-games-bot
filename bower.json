@@ -2,7 +2,8 @@
   "name": "ultimatetictactoe-bower",
   "version": "0.0.1",
   "dependencies": {
-    "ultimatetictactoe-engine": "https://github.com/theaigames/ultimatetictactoe-engine.git"
+    "ultimatetictactoe-engine": "https://github.com/theaigames/ultimatetictactoe-engine.git",
+    "tictactoe-starterbot-js": "http://theaigames.com/downloads/starterbots/tictactoe-starterbot-js.zip"
   },
   "private": true
 }
