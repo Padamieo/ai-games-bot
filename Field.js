@@ -74,13 +74,13 @@
 
     Field.prototype.parseFromString = function (s) {
 
-        // process.stdout.write("Move " + this.mMoveNr);            
+        // process.stdout.write("Move " + this.mMoveNr);
         var s = s.replace(';', ',');
         var r = s.split(',');
         var counter = 0;
         for (var y = 0; y < 9; y++) {
             for (var x = 0; x < 9; x++) {
-                this.mBoard[x][y] = Number(r[counter]); 
+                this.mBoard[x][y] = Number(r[counter]);
                 counter++;
             }
         }
@@ -135,6 +135,7 @@
                 }
             }
         } else {
+
             var startX = this.getActiveMicroboardX() * 3;
             var startY = this.getActiveMicroboardY() * 3;
             for (var y = startY; y < startY + 3; y++) {

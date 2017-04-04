@@ -115,23 +115,27 @@ Bot.prototype.action = function (data) {
 
     var moves = this.field.getAvailableMoves();
 
-    //process.stderr.write(moves);
-
     var move = moves[Math.floor(Math.random() * moves.length)];
 
     var action = "place_move " + move.x + ' ' + move.y;
 
-    var currentBoard = this.field.mBoard;
-    var breakdown = currentBoard.toString().split(/(.{18})/);
+    if(pkg.debug){
+      var currentBoard = this.field.mBoard;
+      var breakdown = currentBoard.toString().split(/(.{18})/);
 
-    for (i = 0; i < breakdown.length; i++) {
-      var out = breakdown[i].toString();
-      if(out.length > 0){
-        fs.appendFileSync(pkg.output, out+"\n");
+      for (i = 0; i < breakdown.length; i++) {
+        var out = breakdown[i].toString();
+        if(out.length > 0){
+          fs.appendFileSync(pkg.output, out+"\n");
+        }
+      }
+
+      fs.appendFileSync(pkg.output, "--- "+action+ "\n");
+      for (i = 0; i < moves.length; i++) {
+        var v = moves[i];
+        fs.appendFileSync(pkg.output, "--- "+JSON.stringify(v, null, 2)+"\n");
       }
     }
-
-    fs.appendFileSync(pkg.output, "--- "+action+ "\n\n");
 
     return action;
   }
