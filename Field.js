@@ -15,6 +15,8 @@
 (function () {
 
     var Move = require('./Move');
+    var fs = require('fs');
+    var pkg = require('./package.json');
 
     var Field = function () {
 
@@ -100,6 +102,7 @@
             for (var x = 0; x < 3; x++) {
                 this.mMacroboard[x][y] = Number(r[counter]);
                 if(this.mMacroboard[x][y] === -1) {
+                    fs.appendFileSync(pkg.output, this.mActiveMicroboardX+"\n");
                     this.mActiveMicroboardX = x;
                     this.mActiveMicroboardY = y;
                     this.mAllMicroboardsActive = false;
@@ -120,8 +123,6 @@
     };
 
     Field.prototype.getAvailableMoves = function () {
-      var fs = require('fs');
-      var pkg = require('./package.json');
 
         var moves = [];
 
