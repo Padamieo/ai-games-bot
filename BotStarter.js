@@ -13,11 +13,7 @@
 //    limitations under the License.
 
 var fs = require('fs');
-//var pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-//may need to be some sort of promise
-pkg = {};
-pkg.debug = true;
-pkg.output = '../../output.txt';
+var pkg = require('./package.json');
 
 var bot,
     Bot,
@@ -44,6 +40,7 @@ Bot = function () {
   this.options = {};
 
   this.field = new Field();
+
 };
 
 /**
@@ -115,6 +112,9 @@ Bot.prototype.action = function (data) {
 
     var moves = this.field.getAvailableMoves();
 
+  // var b = this.field.isEmpty();
+  var b = this.field.getActiveMicroboardX();
+
     var move = moves[Math.floor(Math.random() * moves.length)];
 
     var action = "place_move " + move.x + ' ' + move.y;
@@ -130,7 +130,9 @@ Bot.prototype.action = function (data) {
         }
       }
 
-      fs.appendFileSync(pkg.output, "--- "+action+ "\n");
+
+
+      fs.appendFileSync(pkg.output, "--- "+action+"///"+b+"\n");
       for (i = 0; i < moves.length; i++) {
         var v = moves[i];
         fs.appendFileSync(pkg.output, "--- "+JSON.stringify(v, null, 2)+"\n");

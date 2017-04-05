@@ -73,8 +73,8 @@
     };
 
     Field.prototype.parseFromString = function (s) {
+        //fs.appendFileSync('../../output.txt', s+"\n");
 
-        // process.stdout.write("Move " + this.mMoveNr);
         var s = s.replace(';', ',');
         var r = s.split(',');
         var counter = 0;
@@ -120,32 +120,56 @@
     };
 
     Field.prototype.getAvailableMoves = function () {
+      var fs = require('fs');
+      var pkg = require('./package.json');
 
         var moves = [];
 
-        if (this.getActiveMicroboardX() === -1) {
-            for (var y = 0; y < 3; y++) {
-                for (var x = 0; x < 3; x++) {
-                    var macroY = Math.floor(y / 3);
-                    var macroX = Math.floor(x / 3);
-                    if(this.mBoard[x][y] === 0
-                        && this.mMacroboard[macroX][macroY] <= 0) {
-                        moves.push(new Move(x, y));
-                    }
-                }
+      /*
+        if(this.isEmpty()){
+
+          for (var y = 0; y < 3; y++) {
+            for (var x = 0; x < 3; x++) {
+              var macroY = Math.floor(y / 3);
+              var macroX = Math.floor(x / 3);
+              fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
+              if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
+                moves.push(new Move(x, y));
+              }
             }
-        } else {
+          }
+
+        }else{
+      */
+
+          if (this.getActiveMicroboardX() === -1) {
+
+            for (var y = 0; y < 3; y++) {
+              for (var x = 0; x < 3; x++) {
+                var macroY = Math.floor(y / 3);
+                var macroX = Math.floor(x / 3);
+                fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
+                if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
+                  moves.push(new Move(x, y));
+                }
+              }
+            }
+
+          } else {
 
             var startX = this.getActiveMicroboardX() * 3;
             var startY = this.getActiveMicroboardY() * 3;
             for (var y = startY; y < startY + 3; y++) {
-                for (var x = startX; x < startX + 3; x++) {
-                    if (this.mBoard[x][y] === 0) {
-                        moves.push(new Move(x, y));
-                    }
+              for (var x = startX; x < startX + 3; x++) {
+                if (this.mBoard[x][y] === 0) {
+                  moves.push(new Move(x, y));
                 }
+              }
             }
-        }
+          }
+        // }
+
+
 
         return moves;
     };
@@ -198,8 +222,8 @@
     };
 
     Field.prototype.isEmpty = function () {
-        for (var x = 0; x < COLS; x++) {
-            for (var y = 0; y < ROWS; y++) {
+        for (var x = 0; x < this.COLS; x++) {
+            for (var y = 0; y < this.ROWS; y++) {
                 if (this.mBoard[x][y] > 0) {
                     return false;
                 }

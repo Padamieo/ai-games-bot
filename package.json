@@ -7,7 +7,7 @@
   "outErr": "err.txt",
   "outLog": "out.txt",
   "debug": true,
-  "output": "../something.txt",
+  "output": "../../output.txt",
   "private": true,
   "compare": "/bower_components/tictactoe-starterbot-js/BotStarter.js",
   "dependencies": {},
