@@ -112,8 +112,9 @@ Bot.prototype.action = function (data) {
 
     var moves = this.field.getAvailableMoves();
 
-  // var b = this.field.isEmpty();
-  var b = this.field.getActiveMicroboardX();
+    // var b = this.field.isEmpty();
+    var x = this.field.getActiveMicroboardX();
+    var y = this.field.getActiveMicroboardY()
 
     var move = moves[Math.floor(Math.random() * moves.length)];
 
@@ -130,9 +131,7 @@ Bot.prototype.action = function (data) {
         }
       }
 
-
-
-      fs.appendFileSync(pkg.output, "--- "+action+"///"+b+"\n");
+      fs.appendFileSync(pkg.output, "--- "+action+"///"+x+"|"+y+"\n");
       for (i = 0; i < moves.length; i++) {
         var v = moves[i];
         fs.appendFileSync(pkg.output, "--- "+JSON.stringify(v, null, 2)+"\n");
@@ -146,7 +145,6 @@ Bot.prototype.action = function (data) {
 
 Bot.prototype.update = function (data) {
 
-    // process.stderr.write(data);
     if (data[0] === 'game') {
       this.field.parseGameData(data[1], data[2]);
     }

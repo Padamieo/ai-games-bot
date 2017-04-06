@@ -32,147 +32,163 @@
         this.mActiveMicroboardY = 0;
 
         this.constructBoard();
-        this.constructMacroBoard();
+        this.constructMacroBoard('mMacroboard');
+
+        this.risk = [];
+        this.constructMacroBoard('risk');
     };
 
 
     Field.prototype.constructBoard = function () {
-
-        this.mBoard = new Array(9);
-
-        for (var i = 0; i < 9; i++) {
-            this.mBoard[i] = [0,0,0,0,0,0,0,0,0];
-        }
-
+      this.mBoard = new Array(9);
+      for (var i = 0; i < 9; i++) {
+        this.mBoard[i] = [0,0,0,0,0,0,0,0,0];
+      }
     };
 
-    Field.prototype.constructMacroBoard = function () {
+    Field.prototype.constructMacroBoard = function (term) {
+      this[term] = new Array(3);
+      for (var i = 0; i < 3; i++) {
+        this[term][i] = [0,0,0];
+      }
+    };
 
-        this.mMacroboard = new Array(3);
-
-        for (var i = 0; i < 3; i++) {
-            this.mMacroboard[i] = [0,0,0];
-        }
-
+    Field.prototype.printMicro = function( value ){
+      var batch = value.split(',');
+      var count = 0;
+      for (var i = 0; i < batch.length; i++) {
+        var newline = (count === 2 ? "\n" : '' );
+        fs.appendFileSync(pkg.output, batch[i]+","+newline);
+        var count = ( newline === "\n" ? 0 : count+1 );
+      }
+      fs.appendFileSync(pkg.output, "---\n");
     };
 
     Field.prototype.parseGameData = function (key, value) {
 
         if (key === 'round') {
-            this.mRoundNr = Number(value);
-            // console.log(this.mRoundNr);
+          this.mRoundNr = Number(value);
         }
         if (key === 'move') {
-            this.mMoveNr = Number(value);
-            // console.log(this.mMoveNr);
+          this.mMoveNr = Number(value);
         }
         if (key === 'field') {
-            this.parseFromString(value);
+          this.parseFromString(value);
         }
         if (key === 'macroboard') {
-            this.parseMacroboardFromString(value);
+
+          //this.printMicro(value);
+
+          this.parseMacroboardFromString(value);
         }
     };
 
     Field.prototype.parseFromString = function (s) {
-        //fs.appendFileSync('../../output.txt', s+"\n");
 
-        var s = s.replace(';', ',');
-        var r = s.split(',');
-        var counter = 0;
-        for (var y = 0; y < 9; y++) {
-            for (var x = 0; x < 9; x++) {
-                this.mBoard[x][y] = Number(r[counter]);
-                counter++;
-            }
+      var s = s.replace(';', ',');
+      var r = s.split(',');
+      var counter = 0;
+      for (var y = 0; y < 9; y++) {
+        for (var x = 0; x < 9; x++) {
+          this.mBoard[x][y] = Number(r[counter]);
+          counter++;
         }
-        // console.log(this.mBoard);
+      }
+
     };
 
     Field.prototype.parseMacroboardFromString = function (s) {
 
-        var r = s.split(','),
-            counter = 0;
+        var r = s.split(','), counter = 0;
 
         this.mActiveMicroboardX = -1;
         this.mActiveMicroboardY = -1;
         this.mAllMicroboardsActive = true;
 
         for (var y = 0; y < 3; y++) {
-            for (var x = 0; x < 3; x++) {
-                this.mMacroboard[x][y] = Number(r[counter]);
-                if(this.mMacroboard[x][y] === -1) {
-                    fs.appendFileSync(pkg.output, this.mActiveMicroboardX+"\n");
-                    this.mActiveMicroboardX = x;
-                    this.mActiveMicroboardY = y;
-                    this.mAllMicroboardsActive = false;
-                }
-                counter++;
+          for (var x = 0; x < 3; x++) {
+            this.mMacroboard[x][y] = Number(r[counter]);
+            if(this.mMacroboard[x][y] === -1) {
+              // fs.appendFileSync(pkg.output, this.mActiveMicroboardX+"|"+this.mActiveMicroboardY+"\n");
+              // fs.appendFileSync(pkg.output, this.mMacroboard[x][y]+"\n");
+
+              this.mActiveMicroboardX = x;
+              this.mActiveMicroboardY = y;
+              this.mAllMicroboardsActive = false;
             }
+            counter++;
+          }
         }
-        // console.log(this.mMacroboard);
+
     };
 
     Field.prototype.clearBoard = function () {
-
-        for (var x = 0; x < 9; x++) {
-            for (var y = 0; y < 9; y++) {
-                this.mBoard[x][y] = 0;
-            }
+      for (var x = 0; x < 9; x++) {
+        for (var y = 0; y < 9; y++) {
+          this.mBoard[x][y] = 0;
         }
+      }
     };
+
+
 
     Field.prototype.getAvailableMoves = function () {
 
-        var moves = [];
+      var moves = [];
 
+      if(this.isEmpty()){
+        var preferance = [[0,0],[0,8],[8,0],[8,8]];
+        for (var i = 0; i < preferance.length; i++) {
+          moves.push(new Move(preferance[i][0], preferance[i][1]));
+        }
+        return moves;
+      }
+
+      if (this.getActiveMicroboardX() === -1) {
       /*
-        if(this.isEmpty()){
-
-          for (var y = 0; y < 3; y++) {
-            for (var x = 0; x < 3; x++) {
-              var macroY = Math.floor(y / 3);
-              var macroX = Math.floor(x / 3);
-              fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
-              if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
-                moves.push(new Move(x, y));
-              }
+        for (var y = 0; y < 3; y++) {
+          for (var x = 0; x < 3; x++) {
+            var macroY = Math.floor(y / 3);
+            var macroX = Math.floor(x / 3);
+            fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
+            if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
+              moves.push(new Move(x, y));
             }
           }
-
-        }else{
+        }
       */
 
-          if (this.getActiveMicroboardX() === -1) {
+      } else {
 
-            for (var y = 0; y < 3; y++) {
-              for (var x = 0; x < 3; x++) {
-                var macroY = Math.floor(y / 3);
-                var macroX = Math.floor(x / 3);
-                fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
-                if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
-                  moves.push(new Move(x, y));
-                }
-              }
-            }
+        var startX = this.getActiveMicroboardX() * 3;
+        var startY = this.getActiveMicroboardY() * 3;
 
-          } else {
-
-            var startX = this.getActiveMicroboardX() * 3;
-            var startY = this.getActiveMicroboardY() * 3;
-            for (var y = startY; y < startY + 3; y++) {
-              for (var x = startX; x < startX + 3; x++) {
-                if (this.mBoard[x][y] === 0) {
-                  moves.push(new Move(x, y));
-                }
-              }
+        for (var y = startY; y < startY + 3; y++) {
+          for (var x = startX; x < startX + 3; x++) {
+            if (this.mBoard[x][y] === 0) {
+              moves.push(new Move(x, y));
             }
           }
-        // }
+        }
 
+        //fs.appendFileSync(pkg.output, "@@"+this.mBoardEmpty()+"\n");
 
+      }
 
-        return moves;
+      return moves;
+    };
+
+    Field.prototype.mBoardEmpty = function () {
+      var startX = this.getActiveMicroboardX() * 3;
+      var startY = this.getActiveMicroboardY() * 3;
+      for (var y = startY; y < startY + 3; y++) {
+        for (var x = startX; x < startX + 3; x++) {
+          if (this.mBoard[x][y] > 0) {
+            return false;
+          }
+        }
+      }
+      return true;
     };
 
     Field.prototype.isInActiveMicroboard = function (x, y) {
@@ -223,18 +239,18 @@
     };
 
     Field.prototype.isEmpty = function () {
-        for (var x = 0; x < this.COLS; x++) {
-            for (var y = 0; y < this.ROWS; y++) {
-                if (this.mBoard[x][y] > 0) {
-                    return false;
-                }
-            }
+      for (var x = 0; x < this.COLS; x++) {
+        for (var y = 0; y < this.ROWS; y++) {
+          if (this.mBoard[x][y] > 0) {
+            return false;
+          }
         }
-        return true;
+      }
+      return true;
     };
 
     Field.prototype.getPlayerId = function (column, row) {
-        return this.mBoard[column][row];
+      return this.mBoard[column][row];
     };
 
     module.exports = Field;

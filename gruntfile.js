@@ -32,6 +32,17 @@ module.exports = function(grunt){
         }
 			},
 
+      reverse: {
+				command: [
+					'cd ./bower_components/'+pkg.engineFolder+'/',
+					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+pkg.compare+'" "node '+thisUrl+'/BotStarter.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
+				].join('&&'),
+        callback: function(err, stdout, stderr, cb) {
+					console.log("done");
+          cb();
+        }
+			},
+
       calum: {
         command: [
           'cd ./bower_components/'+pkg.engineFolder+'/',
@@ -74,7 +85,13 @@ module.exports = function(grunt){
     "clean:engineOut"
 	]);
 
+  grunt.registerTask('reverse', [
+    "clean:log",
+    "shell:reverse"
+  ]);
+
   grunt.registerTask('calum', [
+    "clean:log",
     "shell:calum"
   ]);
 
