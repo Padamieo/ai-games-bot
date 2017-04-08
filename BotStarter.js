@@ -110,18 +110,14 @@ Bot.prototype.action = function (data) {
 
   if (data[0] === 'move') {
 
-    var moves = this.field.getAvailableMoves();
-
-    // var b = this.field.isEmpty();
-    var x = this.field.getActiveMicroboardX();
-    var y = this.field.getActiveMicroboardY()
+    var moves = this.field.getAvailableMoves( this.options['your_botid'] );
 
     var move = moves[Math.floor(Math.random() * moves.length)];
 
     var action = "place_move " + move.x + ' ' + move.y;
 
     if(pkg.debug){
-      var currentBoard = this.field.mBoard;
+      var currentBoard = this.field.board;
       var breakdown = currentBoard.toString().split(/(.{18})/);
 
       for (i = 0; i < breakdown.length; i++) {
@@ -131,13 +127,13 @@ Bot.prototype.action = function (data) {
         }
       }
 
-      fs.appendFileSync(pkg.output, "--- "+action+"///"+x+"|"+y+"\n");
+      //fs.appendFileSync(pkg.output, "--- "+action+"///"+x+"|"+y+"\n");
       for (i = 0; i < moves.length; i++) {
         var v = moves[i];
         fs.appendFileSync(pkg.output, "--- "+JSON.stringify(v, null, 2)+"\n");
       }
+      fs.appendFileSync(pkg.output, "SUBMIT\n");
     }
-
     return action;
   }
 

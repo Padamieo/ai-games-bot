@@ -20,8 +20,8 @@
 
     var Field = function () {
 
-        this.mBoard = [];
-        this.mMacroboard = [];
+        this.board = [];
+        this.macroBoard = [];
         this.mLastError = '';
         this.mLastX = 0;
         this.mLastY = 0;
@@ -32,17 +32,20 @@
         this.mActiveMicroboardY = 0;
 
         this.constructBoard();
-        this.constructMacroBoard('mMacroboard');
+        this.constructMacroBoard('macroBoard');
 
         this.risk = [];
         this.constructMacroBoard('risk');
+
+        this.info = [];
+        this.constructMacroBoard('info');
     };
 
 
     Field.prototype.constructBoard = function () {
-      this.mBoard = new Array(9);
+      this.board = new Array(9);
       for (var i = 0; i < 9; i++) {
-        this.mBoard[i] = [0,0,0,0,0,0,0,0,0];
+        this.board[i] = [0,0,0,0,0,0,0,0,0];
       }
     };
 
@@ -90,7 +93,7 @@
       var counter = 0;
       for (var y = 0; y < 9; y++) {
         for (var x = 0; x < 9; x++) {
-          this.mBoard[x][y] = Number(r[counter]);
+          this.board[x][y] = Number(r[counter]);
           counter++;
         }
       }
@@ -107,10 +110,8 @@
 
         for (var y = 0; y < 3; y++) {
           for (var x = 0; x < 3; x++) {
-            this.mMacroboard[x][y] = Number(r[counter]);
-            if(this.mMacroboard[x][y] === -1) {
-              // fs.appendFileSync(pkg.output, this.mActiveMicroboardX+"|"+this.mActiveMicroboardY+"\n");
-              // fs.appendFileSync(pkg.output, this.mMacroboard[x][y]+"\n");
+            this.macroBoard[x][y] = Number(r[counter]);
+            if(this.macroBoard[x][y] === -1) {
 
               this.mActiveMicroboardX = x;
               this.mActiveMicroboardY = y;
@@ -125,19 +126,19 @@
     Field.prototype.clearBoard = function () {
       for (var x = 0; x < 9; x++) {
         for (var y = 0; y < 9; y++) {
-          this.mBoard[x][y] = 0;
+          this.board[x][y] = 0;
         }
       }
     };
 
 
 
-    Field.prototype.getAvailableMoves = function () {
+    Field.prototype.getAvailableMoves = function ( botId ) {
 
       var moves = [];
 
       if(this.isEmpty()){
-        var preferance = [[0,0],[0,8],[8,0],[8,8]];
+        var preferance = [[0,0],[0,8],[8,0],[8,8],[4,4]];
         for (var i = 0; i < preferance.length; i++) {
           moves.push(new Move(preferance[i][0], preferance[i][1]));
         }
@@ -145,13 +146,14 @@
       }
 
       if (this.getActiveMicroboardX() === -1) {
+
       /*
         for (var y = 0; y < 3; y++) {
           for (var x = 0; x < 3; x++) {
             var macroY = Math.floor(y / 3);
             var macroX = Math.floor(x / 3);
             fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
-            if(this.mBoard[x][y] === 0 && this.mMacroboard[macroX][macroY] <= 0) {
+            if(this.board[x][y] === 0 && this.macroBoard[macroX][macroY] <= 0) {
               moves.push(new Move(x, y));
             }
           }
@@ -160,30 +162,116 @@
 
       } else {
 
-        var startX = this.getActiveMicroboardX() * 3;
-        var startY = this.getActiveMicroboardY() * 3;
+        var macroX = this.getActiveMicroboardX();
+        var macroY = this.getActiveMicroboardY();
+        var startX = macroX * 3;
+        var startY = macroY * 3;
+
+        info = this.microInfo(macroX, macroY);
 
         for (var y = startY; y < startY + 3; y++) {
           for (var x = startX; x < startX + 3; x++) {
-            if (this.mBoard[x][y] === 0) {
+            if (this.board[x][y] === 0) {
               moves.push(new Move(x, y));
             }
           }
         }
 
-        //fs.appendFileSync(pkg.output, "@@"+this.mBoardEmpty()+"\n");
+        if(moves.length === 9){
+          for (var i = moves.length - 1; i >= 0; i--) {
+            if(!(i % 2 === 0)){
+              moves.splice(i, 1);
+            }
+          }
+        }
+
+        var enemyId = this.enemyId(botId);
+
+        if(info[botId] === 1 && info[enemyId] === 0){
+
+          fs.appendFileSync(pkg.output, "@@"+JSON.stringify(info)+"\n");
+          //fs.appendFileSync(pkg.output, "@@\n");
+        }
+
+        if(info[botId] === 2){
+
+          fs.appendFileSync(pkg.output, "##"+JSON.stringify(info)+"\n");
+          //fs.appendFileSync(pkg.output, "@@\n");
+        }
+
 
       }
 
       return moves;
     };
 
-    Field.prototype.mBoardEmpty = function () {
+    Field.prototype.enemyId = function ( botId ) {
+      return (botId === 2 ? 1 : 2);
+    };
+
+    Field.prototype.microInfo = function (macroX, macroY) {
+      if(this.info[macroX][macroY] === 0){
+        info = { 1:0, 2:0 };
+      }else{
+        info = { 1:0, 2:0 }; //this.info[macroX][macroY];
+      }
+
+      //fs.appendFileSync(pkg.output, "@@"+JSON.stringify(this.info)+"\n");
+
+      // var contents = [];
+
+      var startX = macroX * 3;
+      var startY = macroY * 3;
+
+      for (var y = startY; y < startY + 3; y++) {
+        for (var x = startX; x < startX + 3; x++) {
+          if (this.board[x][y] === 1) {
+            info[1] = info[1]+1;
+          }else if (this.board[x][y] === 2) {
+            info[2] = info[2]+1;
+          }
+          //contents.push(this.board[x][y]);
+        }
+      }
+
+      this.info[macroX][macroY] = info;
+
+      // a = this.aa(a);
+      //
+      // var result = [];
+      // var merged = [];
+      // contents.forEach(function (element, index) {
+      //     var group = index % 3;
+      //     var temp = result[group];
+      //
+      //     if (!Array.isArray(temp)) {
+      //         temp = [];
+      //     }
+      //
+      //     temp.push(element);
+      //     result[group] = temp;
+      //     merged = [].concat.apply([], result);
+      // });
+      //
+      // fs.appendFileSync(pkg.output, "@@@@@\n");
+      // var count = 0;
+      // for (var i = 0; i < merged.length; i++) {
+      //   var newline = (count === 2 ? "\n" : '' );
+      //   fs.appendFileSync(pkg.output, merged[i]+","+newline);
+      //   var count = ( newline === "\n" ? 0 : count+1 );
+      // }
+      // fs.appendFileSync(pkg.output, "@@@@@\n");
+      //
+      // fs.appendFileSync(pkg.output, "@"+JSON.stringify(a)+"\n");
+      return info;
+    };
+
+    Field.prototype.boardEmpty = function () {
       var startX = this.getActiveMicroboardX() * 3;
       var startY = this.getActiveMicroboardY() * 3;
       for (var y = startY; y < startY + 3; y++) {
         for (var x = startX; x < startX + 3; x++) {
-          if (this.mBoard[x][y] > 0) {
+          if (this.board[x][y] > 0) {
             return false;
           }
         }
@@ -218,7 +306,7 @@
                 if (counter > 0) {
                     r += ',';
                 }
-                r += this.mBoard[x][y];
+                r += this.board[x][y];
                 counter++;
             }
         }
@@ -228,7 +316,7 @@
     Field.prototype.isFull = function () {
         for (var x = 0; x < 9; x++) {
             for (var y = 0; y < 9; y++) {
-                if (this.mBoard[x][y] == 0) {
+                if (this.board[x][y] == 0) {
                     // At least one cell is not filled
                     return false;
                 }
@@ -241,7 +329,7 @@
     Field.prototype.isEmpty = function () {
       for (var x = 0; x < this.COLS; x++) {
         for (var y = 0; y < this.ROWS; y++) {
-          if (this.mBoard[x][y] > 0) {
+          if (this.board[x][y] > 0) {
             return false;
           }
         }
@@ -249,9 +337,9 @@
       return true;
     };
 
-    Field.prototype.getPlayerId = function (column, row) {
-      return this.mBoard[column][row];
-    };
+    // Field.prototype.getPlayerId = function (column, row) {
+    //   return this.board[column][row];
+    // };
 
     module.exports = Field;
 
