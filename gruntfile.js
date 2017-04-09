@@ -24,7 +24,7 @@ module.exports = function(grunt){
 			compare: {
 				command: [
 					'cd ./bower_components/'+pkg.engineFolder+'/',
-					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+'/BotStarter.js" "node '+thisUrl+pkg.compare+'" 2>'+pkg.outErr+' 1>'+pkg.outLog
+					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+'/main.js" "node '+thisUrl+pkg.compare+'" 2>'+pkg.outErr+' 1>'+pkg.outLog
 				].join('&&'),
         callback: function(err, stdout, stderr, cb) {
 					console.log("done");
@@ -35,7 +35,7 @@ module.exports = function(grunt){
       reverse: {
 				command: [
 					'cd ./bower_components/'+pkg.engineFolder+'/',
-					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+pkg.compare+'" "node '+thisUrl+'/BotStarter.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
+					'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "node '+thisUrl+pkg.compare+'" "node '+thisUrl+'/main.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
 				].join('&&'),
         callback: function(err, stdout, stderr, cb) {
 					console.log("done");
@@ -46,7 +46,7 @@ module.exports = function(grunt){
       calum: {
         command: [
           'cd ./bower_components/'+pkg.engineFolder+'/',
-          'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "python ../AiGames/mybot.py" "node '+thisUrl+'/BotStarter.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
+          'java -cp "lib/java-json.jar;classes" '+pkg.javaGame+' "python ../AiGames/mybot.py" "node '+thisUrl+'/main.js" 2>'+pkg.outErr+' 1>'+pkg.outLog
         ].join('&&'),
         callback: function(err, stdout, stderr, cb) {
           console.log("done");
@@ -55,6 +55,17 @@ module.exports = function(grunt){
       }
 
 		},
+
+    compress: {
+      main: {
+        options: {
+          archive: 'bot.zip'
+        },
+        files: [
+          {flatten: true, src: ['main.js', 'package.json', 'Move.js', 'Field.js'], filter: 'isFile'}
+        ]
+      }
+    },
 
     clean: {
       log: {
@@ -69,6 +80,8 @@ module.exports = function(grunt){
     }
 
 	});
+
+  grunt.loadNpmTasks('grunt-contrib-compress');
 
 	// our default task, others will come later
 	grunt.registerTask("default", [
@@ -100,4 +113,7 @@ module.exports = function(grunt){
     console.log(thisUrl+pkg.compare);
 	});
 
+  grunt.registerTask('deploy', [
+    "compress:main"
+  ]);
 };
