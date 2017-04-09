@@ -62,7 +62,7 @@ module.exports = function(grunt){
           archive: 'bot.zip'
         },
         files: [
-          {flatten: true, src: ['main.js', 'package.json', 'Move.js', 'Field.js'], filter: 'isFile'}
+          {flatten: true, src: ['main.js', 'package.json', 'Move.js', 'Field.js', 'Print.js'], filter: 'isFile'}
         ]
       }
     },

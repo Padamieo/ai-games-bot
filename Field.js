@@ -15,8 +15,7 @@
 (function () {
 
     var Move = require('./Move');
-    var fs = require('fs');
-    var pkg = require('./package.json');
+    var Print = require('./Print');
 
     var Field = function () {
 
@@ -63,10 +62,10 @@
       var count = 0;
       for (var i = 0; i < batch.length; i++) {
         var newline = (count === 2 ? "\n" : '' );
-        fs.appendFileSync(pkg.output, batch[i]+","+newline);
+        Print(batch[i]+","+newline);
         var count = ( newline === "\n" ? 0 : count+1 );
       }
-      fs.appendFileSync(pkg.output, "---\n");
+      Print("---\n");
     };
 
     Field.prototype.parseGameData = function (key, value) {
@@ -152,7 +151,7 @@
           for (var x = 0; x < 3; x++) {
             var macroY = Math.floor(y / 3);
             var macroX = Math.floor(x / 3);
-            fs.appendFileSync(pkg.output, macroY+"-"+macroX+"\n");
+            Print(macroY+"-"+macroX+"\n");
             if(this.board[x][y] === 0 && this.macroBoard[macroX][macroY] <= 0) {
               moves.push(new Move(x, y));
             }
@@ -191,50 +190,101 @@
         }
 
         var enemyId = this.enemyId(botId);
-        if(pkg.debug){
-          if(info[botId] === 1 && info[enemyId] === 0){
 
-            // var array = [];
-            // for (var y = startY; y < startY + 3; y++) {
-            //   for (var x = startX; x < startX + 3; x++) {
-            //     if (this.board[x][y] == botId) {
-            //       array.push(new Move(x, y));
-            //     }
-            //   }
-            // }
+        if(info[botId] === 1 && info[enemyId] === 0){
 
-            locX = (loc[0].x-startX);
-            locY = (loc[0].y-startY);
+          locX = (loc[0].x-startX);
+          locY = (loc[0].y-startY);
 
-            fs.appendFileSync(pkg.output, "@@"+JSON.stringify(loc)+"\n");
+          Print("@@"+JSON.stringify(loc)+"\n");
 
-            potentials = this.potentialPlacements( locX, locY );
+          potentials = this.potentialPlacements( locX, locY );
 
-            // fs.appendFileSync(pkg.output, "@@"+JSON.stringify(locX)+","+JSON.stringify(locY)+"\n");
-            // fs.appendFileSync(pkg.output, "@B@"+JSON.stringify(potentials)+"\n");
+          // Print("@@"+JSON.stringify(locX)+","+JSON.stringify(locY)+"\n");
+          // Print("@B@"+JSON.stringify(potentials)+"\n");
 
-            placements = this.removeRequested( potentials, locX, locY );
+          placements = this.removeRequested( potentials, locX, locY );
 
-            idealmoves = this.covertToMoves( placements, startX, startY );
-            var out = this.diff( moves, idealmoves );
-            fs.appendFileSync(pkg.output, "@1@"+JSON.stringify(out)+"\n");
-            fs.appendFileSync(pkg.output, "@A@"+JSON.stringify(moves)+"\n");
-            fs.appendFileSync(pkg.output, "@B@"+JSON.stringify(idealmoves)+"\n");
+          idealmoves = this.covertToMoves( placements, startX, startY );
+          var out = this.diff( moves, idealmoves );
 
-            //fs.appendFileSync(pkg.output, "@A@"+JSON.stringify(placements)+"\n");
-          }
+          Print("@1@"+JSON.stringify(out)+"\n");
+          Print("@A@"+JSON.stringify(moves)+"\n");
+          Print("@B@"+JSON.stringify(idealmoves)+"\n");
+          //moves = out;
 
-          if(info[botId] === 2 && info[enemyId] === 0){
-            fs.appendFileSync(pkg.output, "##"+JSON.stringify(loc)+"\n");
-            fs.appendFileSync(pkg.output, "##"+JSON.stringify(info)+"\n");
-            //fs.appendFileSync(pkg.output, "@@\n");
-          }
+          //Print("@A@"+JSON.stringify(placements)+"\n");
         }
 
+        if(info[botId] === 2 && info[enemyId] === 0){
+
+          var dirX = this.direction( loc, 'x' );
+          var dirY = this.direction( loc, 'y' );
+          var ideal = [];
+
+          if(dirX === 0 && dirY === 0 ){
+
+            //how the hell do we handle diagonals
+            Print("##DIAGONAL\n");
+
+          }else if( (dirX === 1) && (dirY === 0) ){
+
+            for (var y = startY; y < startY + 3; y++) {
+              if(this.exists( loc, 'y', y) === false){
+                ideal.push(new Move(loc[0].x, y));
+              }
+            }
+
+            if(info[enemyId] === 0){
+              moves = ideal;
+            }else{
+              //var out = this.diff( moves, ideal );
+            }
+
+          }else if( (dirX === 0) && (dirY === 1) ){
+
+            for (var x = startX; x < startX + 3; x++) {
+              var v = this.exists( loc, 'x', x);
+              if(this.exists( loc, 'x', x) === false){
+                ideal.push(new Move(x, loc[0].y));
+              }
+            }
+
+            if(info[enemyId] === 0){
+              moves = ideal;
+            }else{
+              //var out = this.diff( moves, ideal );
+            }
+
+          }else{
+
+            Print("##Error\n");
+            Print("##"+dirX+","+dirY+"\n");
+
+          }
+
+          Print("##"+JSON.stringify(loc)+"\n");
+          Print("##"+JSON.stringify(info)+"\n");
+
+        }
 
       }
 
       return moves;
+    };
+
+    Field.prototype.exists = function( arr, elem, value) {
+      return arr.some(function(el) {
+        return el[elem] === value;
+      });
+    };
+
+    Field.prototype.direction = function( arr, value) {
+      var add = 0;
+      for (var i = 0; i < arr.length; i++) {
+        add = add+arr[i][value];
+      }
+      return (add/arr.length === arr[0][value] ? 1 : 0 );
     };
 
     Field.prototype.diff = function(a, b) {
@@ -387,16 +437,16 @@
       //     merged = [].concat.apply([], result);
       // });
       //
-      // fs.appendFileSync(pkg.output, "@@@@@\n");
+      // Print("@@@@@\n");
       // var count = 0;
       // for (var i = 0; i < merged.length; i++) {
       //   var newline = (count === 2 ? "\n" : '' );
-      //   fs.appendFileSync(pkg.output, merged[i]+","+newline);
+      //   Print(merged[i]+","+newline);
       //   var count = ( newline === "\n" ? 0 : count+1 );
       // }
-      // fs.appendFileSync(pkg.output, "@@@@@\n");
+      // Print("@@@@@\n");
       //
-      // fs.appendFileSync(pkg.output, "@"+JSON.stringify(a)+"\n");
+      // Print("@"+JSON.stringify(a)+"\n");
       return info;
     };
 

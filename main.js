@@ -123,16 +123,16 @@ Bot.prototype.action = function (data) {
       for (i = 0; i < breakdown.length; i++) {
         var out = breakdown[i].toString();
         if(out.length > 0){
-          fs.appendFileSync(pkg.output, out+"\n");
+          Print(out+"\n");
         }
       }
 
-      //fs.appendFileSync(pkg.output, "--- "+action+"///"+x+"|"+y+"\n");
+      //Print("--- "+action+"///"+x+"|"+y+"\n");
       for (i = 0; i < moves.length; i++) {
         var v = moves[i];
-        fs.appendFileSync(pkg.output, "--- "+JSON.stringify(v, null, 2)+"\n");
+        Print("--- "+JSON.stringify(v, null, 2)+"\n");
       }
-      fs.appendFileSync(pkg.output, "SUBMIT\n");
+      Print("SUBMIT\n");
     }
     return action;
   }

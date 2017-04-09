@@ -14,12 +14,15 @@
 
 (function () {
 
-    Move = function (x, y) {
+    var fs = require('fs');
+    var pkg = require('./package.json');
 
-        this.x = x;
-        this.y = y;
+    Print = function ( content ) {
+      if(pkg.debug){
+        fs.appendFileSync(pkg.output, content);
+      }
     };
 
-    module.exports = Move;
+    module.exports = Print;
 
 })();
