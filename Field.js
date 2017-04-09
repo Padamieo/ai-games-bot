@@ -167,12 +167,17 @@
         var startX = macroX * 3;
         var startY = macroY * 3;
 
+        var loc = [];
+
         info = this.microInfo(macroX, macroY);
 
         for (var y = startY; y < startY + 3; y++) {
           for (var x = startX; x < startX + 3; x++) {
             if (this.board[x][y] === 0) {
               moves.push(new Move(x, y));
+            }
+            if (this.board[x][y] == botId) {
+              loc.push(new Move(x, y));
             }
           }
         }
@@ -189,40 +194,38 @@
         if(pkg.debug){
           if(info[botId] === 1 && info[enemyId] === 0){
 
-            var array = [];
-            for (var y = startY; y < startY + 3; y++) {
-              for (var x = startX; x < startX + 3; x++) {
-                if (this.board[x][y] == botId) {
-                  array.push(new Move(x, y));
-                }
-              }
-            }
+            // var array = [];
+            // for (var y = startY; y < startY + 3; y++) {
+            //   for (var x = startX; x < startX + 3; x++) {
+            //     if (this.board[x][y] == botId) {
+            //       array.push(new Move(x, y));
+            //     }
+            //   }
+            // }
 
-            locX = (array[0].x-startX);
-            locY = (array[0].y-startY);
+            locX = (loc[0].x-startX);
+            locY = (loc[0].y-startY);
 
-            fs.appendFileSync(pkg.output, "@@"+JSON.stringify(array)+"\n");
+            fs.appendFileSync(pkg.output, "@@"+JSON.stringify(loc)+"\n");
 
-            array2 = this.idealMoves( locX, locY );
+            potentials = this.potentialPlacements( locX, locY );
 
             // fs.appendFileSync(pkg.output, "@@"+JSON.stringify(locX)+","+JSON.stringify(locY)+"\n");
-            // fs.appendFileSync(pkg.output, "@B@"+JSON.stringify(array2)+"\n");
+            // fs.appendFileSync(pkg.output, "@B@"+JSON.stringify(potentials)+"\n");
 
-            array2 = this.removeRequested( array2, locX, locY );
+            placements = this.removeRequested( potentials, locX, locY );
 
+            idealmoves = this.covertToMoves( placements, startX, startY );
+            var out = this.diff( moves, idealmoves );
+            fs.appendFileSync(pkg.output, "@1@"+JSON.stringify(out)+"\n");
+            fs.appendFileSync(pkg.output, "@A@"+JSON.stringify(moves)+"\n");
+            fs.appendFileSync(pkg.output, "@B@"+JSON.stringify(idealmoves)+"\n");
 
-
-            for (var i = moves.length - 1; i >= 0; i--) {
-              for (var i = array2.length - 1; i >= 0; i--) {
-
-              }
-            }
-
-            //fs.appendFileSync(pkg.output, "@A@"+JSON.stringify(array2)+"\n");
+            //fs.appendFileSync(pkg.output, "@A@"+JSON.stringify(placements)+"\n");
           }
 
-          if(info[botId] === 2){
-
+          if(info[botId] === 2 && info[enemyId] === 0){
+            fs.appendFileSync(pkg.output, "##"+JSON.stringify(loc)+"\n");
             fs.appendFileSync(pkg.output, "##"+JSON.stringify(info)+"\n");
             //fs.appendFileSync(pkg.output, "@@\n");
           }
@@ -234,7 +237,19 @@
       return moves;
     };
 
+    Field.prototype.diff = function(a, b) {
+        return b.filter(x => a.indexOf(x) == -1);
+    };
 
+    Field.prototype.covertToMoves = function( arr, startX, startY ){
+      array = [];
+      for (var i = 0; i < arr.length; i++) {
+        var x = arr[i][0]+startX;
+        var y = arr[i][1]+startY;
+        array.push(new Move( x, y ));
+      }
+      return array;
+    };
 
     Field.prototype.removeRequested = function( arr, x, y ){
       for (var i = arr.length - 1; i >= 0; i--) {
@@ -258,7 +273,7 @@
       return out;
     };
 
-    Field.prototype.idealMoves = function ( x, y ) {
+    Field.prototype.potentialPlacements = function ( x, y ) {
       var array = [];
 
       //00, 01, 02

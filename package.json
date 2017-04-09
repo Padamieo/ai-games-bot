@@ -6,7 +6,7 @@
   "engineFolder": "ultimatetictactoe-engine",
   "outErr": "err.txt",
   "outLog": "out.txt",
-  "debug": false,
+  "debug": true,
   "output": "../../output.txt",
   "private": true,
   "compare": "/bower_components/tictactoe-starterbot-js/BotStarter.js",
