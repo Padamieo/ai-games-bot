@@ -126,14 +126,11 @@ Bot.prototype.action = function (data) {
           Print(out+"\n");
         }
       }
-
-      //Print("--- "+action+"///"+x+"|"+y+"\n");
-      for (i = 0; i < moves.length; i++) {
-        var v = moves[i];
-        Print("--- "+JSON.stringify(v, null, 2)+"\n");
-      }
-      Print("SUBMIT\n");
     }
+
+    Print("---"+JSON.stringify(moves)+"\n");
+    Print(JSON.stringify(move)+"SUBMIT\n\n");
+
     return action;
   }
 
