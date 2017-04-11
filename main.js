@@ -109,8 +109,8 @@ Bot.prototype.settings = function (data) {
 Bot.prototype.action = function (data) {
 
   if (data[0] === 'move') {
-
-    var moves = this.field.getAvailableMoves( this.options['your_botid'] );
+    var botId = this.options['your_botid'];
+    var moves = this.field.getAvailableMoves( botId );
 
     var move = moves[Math.floor(Math.random() * moves.length)];
 

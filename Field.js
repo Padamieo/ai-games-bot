@@ -168,19 +168,21 @@
 
         var loc = [];
         var enemyloc = [];
-        var enemyId = this.enemyId(botId);
+        var botId = parseInt(botId, 10);
+        var enemyId = parseInt(this.enemyId(botId), 10);
 
-        info = this.microInfo(macroX, macroY);
+        var info = this.microInfo(macroX, macroY);
 
         for (var y = startY; y < startY + 3; y++) {
           for (var x = startX; x < startX + 3; x++) {
-            if (this.board[x][y] === 0) {
+            var v = parseInt(this.board[x][y], 10);
+            if (v === 0) {
               moves.push(new Move(x, y));
             }
-            if (this.board[x][y] == botId) {
+            if (v === botId) {
               loc.push(new Move(x, y));
             }
-            if (this.board[x][y] == enemyId) {
+            if (v === enemyId) {
               enemyloc.push(new Move(x, y));
             }
           }
@@ -196,11 +198,41 @@
         }
 
         if(info[botId] === 1 && info[enemyId] === 0){
+          Print("P1E0\n");
+          if(loc.length < 0){
 
+            locX = (loc[0].x-startX);
+            locY = (loc[0].y-startY);
+
+            placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
+
+            idealmoves = this.covertToMoves( placements, startX, startY );
+            var out = this.diff( moves, idealmoves );
+
+            moves = out;
+          }
+        }
+
+
+        if(info[botId] === 1 && info[enemyId] === 1){
+          Print("P1E1\n");
           locX = (loc[0].x-startX);
           locY = (loc[0].y-startY);
 
           placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
+          //Print("@1@"+JSON.stringify(placements)+"\n");
+
+          if(info[enemyId] === 1){
+            //Print("@E@"+JSON.stringify(enemyloc)+"\n");
+
+            elocX = (enemyloc[0].x-startX);
+            elocY = (enemyloc[0].y-startY);
+            analyse = JSON.stringify([elocX,elocY]);
+            //var value = this.contain( placements, analyse);
+
+            //Print("@V@"+JSON.stringify(value)+"\n");
+            //Print("@0@"+JSON.stringify(placements)+"\n");
+          }
 
           idealmoves = this.covertToMoves( placements, startX, startY );
           var out = this.diff( moves, idealmoves );
@@ -209,42 +241,12 @@
           // Print("@A@"+JSON.stringify(moves)+"\n");
           // Print("@B@"+JSON.stringify(idealmoves)+"\n");
 
-          moves = out;
-
-        }
-
-        if(info[botId] === 1 && info[enemyId] === 1){
-
-          locX = (loc[0].x-startX);
-          locY = (loc[0].y-startY);
-
-          placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
-          //Print("@1@"+JSON.stringify(placements)+"\n");
-
-          if(info[enemyId] === 1){
-            Print("@E@"+JSON.stringify(enemyloc)+"\n");
-
-            elocX = (enemyloc[0].x-startX);
-            elocY = (enemyloc[0].y-startY);
-            analyse = JSON.stringify([elocX,elocY]);
-            //var value = this.contain( placements, analyse);
-
-            //Print("@V@"+JSON.stringify(value)+"\n");
-            Print("@0@"+JSON.stringify(placements)+"\n");
-          }
-
-          idealmoves = this.covertToMoves( placements, startX, startY );
-          var out = this.diff( moves, idealmoves );
-
-          Print("@1@"+JSON.stringify(out)+"\n");
-          Print("@A@"+JSON.stringify(moves)+"\n");
-          Print("@B@"+JSON.stringify(idealmoves)+"\n");
-
           //moves = out;
         }
 
-        if(info[botId] === 2 && (info[enemyId] === 0 || info[enemyId] === 1 )){
 
+        if(info[botId] === 2 && (info[enemyId] === 0 || info[enemyId] === 1 )){
+          Print("P2E0/1\n");
           var dirX = this.direction( loc, 'x' );
           var dirY = this.direction( loc, 'y' );
           var ideal = [];
@@ -266,7 +268,7 @@
             if(ideal.length === 1){
               moves = ideal;
             }
-            Print("##"+JSON.stringify(potential)+"\n");
+            //Print("##"+JSON.stringify(potential)+"\n");
 
             trbl = [[startX+2,startY], [startX+1, startY+1], [startX, startY+2]];
             count = 0;
@@ -341,6 +343,7 @@
           // Print("##"+JSON.stringify(info)+"\n");
 
         }
+
 
       }
 
@@ -464,7 +467,6 @@
 
       return  array;
     };
-
 
     Field.prototype.enemyId = function ( botId ) {
       return (botId === 2 ? 1 : 2);
