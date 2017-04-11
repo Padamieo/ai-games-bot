@@ -224,13 +224,12 @@
             locY = (loc[0].y-startY);
 
             placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
-            Print("@L@"+startX+","+startY+"\n");
 
             if(info[enemyId] === 1){
               //Print("@E@"+JSON.stringify(enemyloc)+"\n");
 
-              elocX = (enemyloc[0].x-startX);
-              elocY = (enemyloc[0].y-startY);
+              var elocX = (enemyloc[0].x-startX);
+              var elocY = (enemyloc[0].y-startY);
               var analyse = [elocX,elocY];
 
               Print("@V@"+JSON.stringify(placements)+"\n");
@@ -243,9 +242,42 @@
                 }
               }
 
-              if(value){
+              if(value === true){
+                Print("@x@"+elocX+"-"+locX+"\n");
+                Print("@y@"+elocY+"-"+locX+"\n");
 
+                if( elocX === elocY && locX === locX ){
+                  Print("@x@DIA\n");
+                  //found one diagonal
+                  for (var i = placements.length - 1; i >= 0; i--) {
+                    if(placements[i][0] === placements[i][1]){
+                      placements.splice(i, 1);
+                    }
+                  }
+                }else{
+                  if(elocX === locX){
+                    Print("@x@DIA\n");
+                    for (var i = placements.length - 1; i >= 0; i--) {
+                      if(placements[i][0] === locX){
+                        placements.splice(i, 1);
+                      }
+                    }
+                  }else if(elocY === locY){
+                    Print("@x@YYY\n");
+                    for (var i = placements.length - 1; i >= 0; i--) {
+                      if(placements[i][1] === locY){
+                        placements.splice(i, 1);
+                      }
+                    }
+                  }else{
+                    Print("@@UNKOWN\n");
+                  }
+                }
+
+              }else{
+                //default as it does not block our action in any way action
               }
+              Print("@E@"+JSON.stringify(placements)+"\n");
 
             }
 
@@ -280,7 +312,7 @@
             var ideal2 = this.diagonalCheck( trbl, botId );
 
             if(ideal2.length === 1){
-              //moves = ideal;
+              moves = ideal;
             }
 
             Print("##DIAGONAL\n");
@@ -290,10 +322,10 @@
           }else if( (dirX === 1) && (dirY === 0) ){
 
             Print("##OTHERY\n");
-
-            for (var y = startY; y < startY + 3; y++) {
-              if(this.exists( loc, 'y', y) === false){
-                ideal.push(new Move(loc[0].x, y));
+            var ideal = [];
+            for (var a = startY; a < startY + 3; a++) {
+              if(this.exists( loc, 'y', a) === false){
+                ideal.push(new Move(loc[0].x, a));
               }
             }
 
@@ -304,6 +336,7 @@
               Print("##"+JSON.stringify(moves)+"\n");
               var out = this.diff( moves, ideal );
               Print("##"+JSON.stringify(out)+"\n");
+
               if(out.length <= 1){
                 //moves = ideal;
               }
@@ -312,9 +345,8 @@
           }else if( (dirX === 0) && (dirY === 1) ){
 
             Print("##OTHERX\n");
-
+            var ideal = [];
             for (var x = startX; x < startX + 3; x++) {
-              var v = this.exists( loc, 'x', x);
               if(this.exists( loc, 'x', x) === false){
                 ideal.push(new Move(x, loc[0].y));
               }
@@ -427,60 +459,71 @@
       //10, 11, 12
       //20, 21, 22
 
-      if(x === 0 || (x === 0 && y === 2) || (x === 0 && y === 1) ){
-        array.push([0,0]);
-        array.push([0,1]);
-        array.push([0,2]);
-      }
-
-      if(x === 0 && y === 1){
-        array.push([1,1]);
-        array.push([2,1]);
-      }
-
-      if((y === 0) || (x === 2 && y === 0) || (x === 1 && y === 0) ){
+      if(x === 1 && y === 1){
         array.push([0,0]);
         array.push([1,0]);
         array.push([2,0]);
-      }
-
-      if(x === 1 && y === 0){
-        array.push([1,1]);
-        array.push([1,2]);
-      }
-
-      if((x === 0 && y === 0) || (x === 2 && y === 2)){
-        array.push([0,0]);
-        array.push([1,1]);
-        array.push([2,2]);
-      }
-
-      if((x === 2 && y === 0) || (x === 0 && y === 2)){
-        array.push([0,2]);
-        array.push([1,1]);
-        array.push([2,0]);
-      }
-
-      if( y === 2 || (x === 0 && y === 2) || (x === 1 && y === 2) ){
-        array.push([0,2]);
-        array.push([1,2]);
-        array.push([2,2]);
-      }
-
-      if(x === 1 && y === 2){
-        array.push([1,1]);
-        array.push([1,0]);
-      }
-
-      if (x === 2 || (x === 2 && y === 0)  || (x === 2 && y === 1)){
-        array.push([2,0]);
         array.push([2,1]);
         array.push([2,2]);
-      }
-
-      if(x === 2 && y === 1){
-        array.push([1,1]);
+        array.push([1,2]);
+        array.push([0,2]);
         array.push([0,1]);
+      }else{
+        if(x === 0 || (x === 0 && y === 2) || (x === 0 && y === 1) ){
+          array.push([0,0]);
+          array.push([0,1]);
+          array.push([0,2]);
+        }
+
+        if(x === 0 && y === 1){
+          array.push([1,1]);
+          array.push([2,1]);
+        }
+
+        if((y === 0) || (x === 2 && y === 0) || (x === 1 && y === 0) ){
+          array.push([0,0]);
+          array.push([1,0]);
+          array.push([2,0]);
+        }
+
+        if(x === 1 && y === 0){
+          array.push([1,1]);
+          array.push([1,2]);
+        }
+
+        if((x === 0 && y === 0) || (x === 2 && y === 2)){
+          array.push([0,0]);
+          array.push([1,1]);
+          array.push([2,2]);
+        }
+
+        if((x === 2 && y === 0) || (x === 0 && y === 2)){
+          array.push([0,2]);
+          array.push([1,1]);
+          array.push([2,0]);
+        }
+
+        if( y === 2 || (x === 0 && y === 2) || (x === 1 && y === 2) ){
+          array.push([0,2]);
+          array.push([1,2]);
+          array.push([2,2]);
+        }
+
+        if(x === 1 && y === 2){
+          array.push([1,1]);
+          array.push([1,0]);
+        }
+
+        if (x === 2 || (x === 2 && y === 0)  || (x === 2 && y === 1)){
+          array.push([2,0]);
+          array.push([2,1]);
+          array.push([2,2]);
+        }
+
+        if(x === 2 && y === 1){
+          array.push([1,1]);
+          array.push([0,1]);
+        }
       }
 
       array = this.removeDuplicates(array);
