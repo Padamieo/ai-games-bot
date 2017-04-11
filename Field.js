@@ -188,8 +188,11 @@
           }
         }
 
+        Print("L"+startX+","+startY+"\n");
+
         if(moves.length === 9){
           //need to assess larger picture with risk
+          Print("ANY\n");
           for (var i = moves.length - 1; i >= 0; i--) {
             if(!(i % 2 === 0)){
               moves.splice(i, 1);
@@ -216,32 +219,45 @@
 
         if(info[botId] === 1 && info[enemyId] === 1){
           Print("P1E1\n");
-          locX = (loc[0].x-startX);
-          locY = (loc[0].y-startY);
+          //if(loc.length < 0){
+            locX = (loc[0].x-startX);
+            locY = (loc[0].y-startY);
 
-          placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
-          //Print("@1@"+JSON.stringify(placements)+"\n");
+            placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
+            Print("@L@"+startX+","+startY+"\n");
 
-          if(info[enemyId] === 1){
-            //Print("@E@"+JSON.stringify(enemyloc)+"\n");
+            if(info[enemyId] === 1){
+              //Print("@E@"+JSON.stringify(enemyloc)+"\n");
 
-            elocX = (enemyloc[0].x-startX);
-            elocY = (enemyloc[0].y-startY);
-            analyse = JSON.stringify([elocX,elocY]);
-            //var value = this.contain( placements, analyse);
+              elocX = (enemyloc[0].x-startX);
+              elocY = (enemyloc[0].y-startY);
+              var analyse = [elocX,elocY];
 
-            //Print("@V@"+JSON.stringify(value)+"\n");
-            //Print("@0@"+JSON.stringify(placements)+"\n");
-          }
+              Print("@V@"+JSON.stringify(placements)+"\n");
+              Print("@V@"+JSON.stringify(analyse)+"\n");
 
-          idealmoves = this.covertToMoves( placements, startX, startY );
-          var out = this.diff( moves, idealmoves );
+              var value = false;
+              for (var i = 0; i < placements.length; i++) {
+                if(this.arrayMatch( placements[i], analyse)){
+                  value = true;
+                }
+              }
 
-          // Print("@1@"+JSON.stringify(out)+"\n");
-          // Print("@A@"+JSON.stringify(moves)+"\n");
-          // Print("@B@"+JSON.stringify(idealmoves)+"\n");
+              if(value){
 
-          //moves = out;
+              }
+
+            }
+
+            idealmoves = this.covertToMoves( placements, startX, startY );
+            var out = this.diff( moves, idealmoves );
+
+            // Print("@1@"+JSON.stringify(out)+"\n");
+            // Print("@A@"+JSON.stringify(moves)+"\n");
+            // Print("@B@"+JSON.stringify(idealmoves)+"\n");
+
+            //moves = out;
+          //}
         }
 
 
@@ -249,21 +265,11 @@
           Print("P2E0/1\n");
           var dirX = this.direction( loc, 'x' );
           var dirY = this.direction( loc, 'y' );
-          var ideal = [];
 
           if(dirX === 0 && dirY === 0 ){
 
             tlbr = [[startX,startY], [startX+1, startY+1], [startX+2, startY+2]];
-            count = 0;
-            for (var i = 0; i < tlbr.length; i++) {
-              var x = tlbr[i][0];
-              var y = tlbr[i][1];
-              if (this.board[x][y] === botId) {
-                count++;
-              }else if (this.board[x][y] === 0) {
-                ideal.push(new Move(x, y));
-              }
-            }
+            var ideal = this.diagonalCheck( tlbr, botId );
 
             if(ideal.length === 1){
               moves = ideal;
@@ -271,26 +277,19 @@
             //Print("##"+JSON.stringify(potential)+"\n");
 
             trbl = [[startX+2,startY], [startX+1, startY+1], [startX, startY+2]];
-            count = 0;
-            ideal = [];
-            for (var i = 0; i < trbl.length; i++) {
-              var x = trbl[i][0];
-              var y = trbl[i][1];
-              if (this.board[x][y] === botId) {
-                count++;
-              }else if (this.board[x][y] === 0) {
-                ideal.push(new Move(x, y));
-              }
-            }
+            var ideal2 = this.diagonalCheck( trbl, botId );
 
-            if(ideal.length === 1){
-              moves = ideal;
+            if(ideal2.length === 1){
+              //moves = ideal;
             }
 
             Print("##DIAGONAL\n");
-            Print("##"+JSON.stringify(potential)+"\n");
+            Print("##"+JSON.stringify(ideal)+"\n");
+            Print("##"+JSON.stringify(ideal2)+"\n");
 
           }else if( (dirX === 1) && (dirY === 0) ){
+
+            Print("##OTHERY\n");
 
             for (var y = startY; y < startY + 3; y++) {
               if(this.exists( loc, 'y', y) === false){
@@ -301,16 +300,18 @@
             if(info[enemyId] === 0){
               moves = ideal;
             }else{
-              Print("##OTHERY\n");
+
               Print("##"+JSON.stringify(moves)+"\n");
               var out = this.diff( moves, ideal );
               Print("##"+JSON.stringify(out)+"\n");
               if(out.length <= 1){
-                moves = ideal;
+                //moves = ideal;
               }
             }
 
           }else if( (dirX === 0) && (dirY === 1) ){
+
+            Print("##OTHERX\n");
 
             for (var x = startX; x < startX + 3; x++) {
               var v = this.exists( loc, 'x', x);
@@ -322,12 +323,12 @@
             if(info[enemyId] === 0){
               moves = ideal;
             }else{
-              Print("##OTHERX\n");
+
               Print("##"+JSON.stringify(moves)+"\n");
               var out = this.diff( moves, ideal );
               Print("##"+JSON.stringify(out)+"\n");
               if(out.length <= 1){
-                moves = ideal;
+                //moves = ideal;
               }
 
             }
@@ -339,15 +340,34 @@
 
           }
 
-          // Print("##"+JSON.stringify(loc)+"\n");
-          // Print("##"+JSON.stringify(info)+"\n");
-
         }
 
 
       }
 
       return moves;
+    };
+
+    Field.prototype.diagonalCheck = function( array, id ){
+      count = 0;
+      ideal = [];
+      for (var i = 0; i < array.length; i++) {
+        var x = array[i][0];
+        var y = array[i][1];
+        if (this.board[x][y] === id) {
+          count++;
+        }else if (this.board[x][y] === 0) {
+          ideal.push(new Move(x, y));
+        }
+      }
+      return ideal;
+    };
+
+    Field.prototype.arrayMatch = function( arrA, arrB ) {
+      if(arrA.length !== arrB.length) return false;
+      var cA = arrA.slice().sort().join(",");
+      var cB = arrB.slice().sort().join(",");
+      return cA === cB;
     };
 
     Field.prototype.exists = function( arr, elem, value) {
