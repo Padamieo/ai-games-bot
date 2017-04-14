@@ -246,7 +246,7 @@
                 Print("@x@"+elocX+"-"+locX+"\n");
                 Print("@y@"+elocY+"-"+locX+"\n");
 
-                if( elocX === elocY && locX === locX ){
+                if( (elocX === elocY) && (locX === locY) ){
                   Print("@x@DIA\n");
                   //found one diagonal
                   for (var i = placements.length - 1; i >= 0; i--) {
@@ -271,6 +271,8 @@
                     }
                   }else{
                     Print("@@UNKOWN\n");
+
+
                   }
                 }
 
