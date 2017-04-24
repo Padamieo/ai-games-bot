@@ -171,7 +171,7 @@
         var botId = parseInt(botId, 10);
         var enemyId = parseInt(this.enemyId(botId), 10);
 
-        var info = this.microInfo(macroX, macroY);
+        //var info = this.microInfo(macroX, macroY);
 
         for (var y = startY; y < startY + 3; y++) {
           for (var x = startX; x < startX + 3; x++) {
@@ -200,7 +200,9 @@
           // }
         }
 
-        if(info[botId] === 0 ){
+        Print("num:"+loc.length+"\n");
+
+        if(loc.length === 1 ){
           Print("no placment yet\n");
           // if(loc.length < 0){
           //
@@ -216,16 +218,19 @@
           // }
         }else{
 
-          if(info[botId] === 3 ){
-            Print("single placment\n");
-            Print("enemy:"+info[enemyId]+"\n");
-            Print("enemy:"+JSON.stringify(loc)+"\n");
+          if(loc.length > 1 ){
+            //Print("enemy:"+info[botId]+"\n");
+            //Print("enemy:"+info[enemyId]+"\n");
+            Print("our:"+JSON.stringify(loc)+"\n");
             var a = [];
             var b = [];
+            var c = [];
             for (var i = 0; i < loc.length; i++) {
-              
+
               xRow = loc[i].x;
               yRow = loc[i].y;
+
+              c.push(this.diagonall( xRow, yRow, startX, startY, enemyId ));
 
               var positionX = this.possible( xRow, startX );
               a.push(this.viable( positionX, yRow, botId, true ));
@@ -236,32 +241,72 @@
             }
             Print("xrows"+JSON.stringify(a)+"\n");
             Print("yrows"+JSON.stringify(b)+"\n");
+            out = [];
 
+            //
+            //Print("c:"+JSON.stringify(c)+"\n");
+            var cArr = [];
+            for (var i = 0; i < c.length; i++) {
+              cArr.push(c[i].length);
+            }
+            var sumZ = cArr.reduce((a, b) => a + b, 0);
+            var z = cArr.includes(1, 1);
+            if(z){
+              Print("cArr:"+JSON.stringify(cArr)+"\n");
+              for(var i = 0; i < cArr.length; i++){
+                if(cArr[i] === 1){
+                  Print("w:"+JSON.stringify(c[i])+"\n");
+                  out.push(c[i][0]);
+                }
+              }
+            }
 
+            //
             var aArr = [];
             for (var i = 0; i < a.length; i++) {
               aArr.push(a[i].length);
             }
-            Print("aArr"+JSON.stringify(aArr)+"\n");
-            var sum = aArr.reduce((a, b) => a + b, 0);
-            Print("sum"+JSON.stringify(sum)+"\n");
-
+            var sumE = aArr.reduce((a, b) => a + b, 0);
             var e = aArr.includes(1, 1);
-            Print("e"+JSON.stringify(e)+"\n");
+            if(e){
+              Print("aArr:"+JSON.stringify(aArr)+"\n");
+              for(var i = 0; i < aArr.length; i++){
+                if(aArr[i] === 1){
+                  Print("w:"+JSON.stringify(a[i])+"\n");
+                  out.push(a[i][0]);
+                }
+              }
+            }
 
-
-
+            //
             var bArr = [];
             for (var i = 0; i < b.length; i++) {
               bArr.push(b[i].length);
             }
-            Print("bArr"+JSON.stringify(bArr)+"\n");
-
-            var sum = bArr.reduce((a, b) => a + b, 0);
-            Print("sum"+JSON.stringify(sum)+"\n");
-
+            var sumG = bArr.reduce((a, b) => a + b, 0);
             var g = bArr.includes(1, 1);
-            Print("g"+JSON.stringify(g)+"\n");
+            if(g){
+              Print("bArr:"+JSON.stringify(bArr)+"\n");
+              for(var i = 0; i < bArr.length; i++){
+                if(bArr[i] === 1){
+                  Print("w:"+JSON.stringify(b[i])+"\n");
+                  out.push(b[i][0]);
+                }
+              }
+            }
+
+            if(z === true || g === true || e === true){
+
+              Print("WIN WITH SINGLE\n");
+              Print("WIN:"+JSON.stringify(out)+"\n");
+              moves = out;
+            }else{
+              Print("fallback\n");
+              Print("WIN:"+JSON.stringify(c)+"\n");
+              Print("WIN:"+JSON.stringify(a)+"\n");
+              Print("WIN:"+JSON.stringify(b)+"\n");
+            }
+
 
           }
 
@@ -273,7 +318,108 @@
       return moves;
     };
 
+    Field.prototype.diagonall = function( xrow, yrow, startx, starty, enemyId ){
+      otherPos = [];
+      count = 0;
+      //if(xrow === yrow){
+        // for (var i = 0; i < 2; i++) {
+        //   var x = startx+i;
+        //   var y = starty+i;
+        //   if(xrow != x && yrow != y ){
+        //
+        //     if(this.board[x][y] === 0){
+        //       otherPos.push(new Move(x, y));
+        //     }else if(this.board[x][y] === enemyId){
+        //       count++;
+        //     }
+        //   }
+        // }
+      //}else{
 
+        // if( (xrow === startx) && (yrow === starty) ){
+        //
+        //   if(this.board[startx+1][starty+1] === 0){
+        //     otherPos.push(new Move(startx+1, starty+1));
+        //   }else if(this.board[startx+1][starty+1] === enemyId){
+        //     count++;
+        //   }
+        //
+        //   if(this.board[startx+2][starty+2] === 0){
+        //     otherPos.push(new Move(startx+2, starty+2));
+        //   }else if(this.board[startx+2][starty+2] === enemyId){
+        //     count++;
+        //   }
+        // }
+        //
+        // if( (xrow === startx+2) && (yrow === starty+2) ){
+        //
+        //   if(this.board[startx+1][starty+1] === 0){
+        //     otherPos.push(new Move(startx+1, starty+1));
+        //   }else if(this.board[startx+1][starty+1] === enemyId){
+        //     count++;
+        //   }
+        //
+        //   if(this.board[startx][starty] === 0){
+        //     otherPos.push(new Move(startx, starty));
+        //   }else if(this.board[startx][starty] === enemyId){
+        //     count++;
+        //   }
+        // }
+
+        if( (xrow === startx+2) && (yrow === starty) ){
+
+          if(this.board[startx+1][starty+1] === 0){
+            otherPos.push(new Move(startx+1, starty+1));
+          }else if(this.board[startx+1][starty+1] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx][starty+2] === 0){
+            otherPos.push(new Move(startx, starty+2));
+          }else if(this.board[startx][starty+2] === enemyId){
+            count++;
+          }
+        }
+
+        if( (xrow === startx) && (yrow === starty+2) ){
+
+          if(this.board[startx+1][starty+1] === 0){
+            otherPos.push(new Move(startx+1, starty+1));
+          }else if(this.board[startx+1][starty+1] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx+2][starty] === 0){
+            otherPos.push(new Move(startx+2, starty));
+          }else if(this.board[startx+2][starty] === enemyId){
+            count++;
+          }
+        }
+
+        if( (xrow === startx+1) && (yrow === starty+1) ){
+
+          if(this.board[startx][starty+2] === 0){
+            otherPos.push(new Move(startx, starty+2));
+          }else if(this.board[startx][starty+2] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx+2][starty] === 0){
+            otherPos.push(new Move(startx+2, starty));
+          }else if(this.board[startx+2][starty] === enemyId){
+            count++;
+          }
+        }
+
+      //}
+
+      if(count === 0){
+        return otherPos;
+      }else{
+        return [];
+      }
+
+    };
 
     Field.prototype.viable = function( array, other, botId, set ){
       var pos = [];
@@ -310,6 +456,9 @@
       }
       return otherPos;
     };
+
+
+
 
     Field.prototype.diagonalCheck = function( array, id ){
       count = 0;
@@ -461,6 +610,8 @@
 
       return  array;
     };
+
+
 
     Field.prototype.enemyId = function ( botId ) {
       return (botId === 2 ? 1 : 2);
