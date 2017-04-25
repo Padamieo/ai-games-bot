@@ -202,7 +202,7 @@
 
         Print("num:"+loc.length+"\n");
 
-        if(loc.length === 1 ){
+        if(loc.length === 0 ){
           Print("no placment yet\n");
           // if(loc.length < 0){
           //
@@ -216,6 +216,7 @@
           //
           //   moves = out;
           // }
+
         }else{
 
           if(loc.length > 1 ){
@@ -305,6 +306,13 @@
               Print("WIN:"+JSON.stringify(c)+"\n");
               Print("WIN:"+JSON.stringify(a)+"\n");
               Print("WIN:"+JSON.stringify(b)+"\n");
+              //Print("b:"+JSON.stringify(sumG)+"\n");
+              for(var i = 0; i < bArr.length; i++){
+                for(var x = 0; x < b[i].length; x++){
+                  Print("b:"+JSON.stringify(b[i][x])+"\n");
+                }
+              };
+
             }
 
 
