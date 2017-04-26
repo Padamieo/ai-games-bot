@@ -222,16 +222,19 @@
           if(loc.length > 1 ){
             //Print("enemy:"+info[botId]+"\n");
             //Print("enemy:"+info[enemyId]+"\n");
-            Print("our:"+JSON.stringify(loc)+"\n");
+            Print("loc:"+JSON.stringify(loc)+"\n");
             var a = [];
             var b = [];
             var c = [];
+            var v = [];
             for (var i = 0; i < loc.length; i++) {
 
               xRow = loc[i].x;
               yRow = loc[i].y;
 
-              c.push(this.diagonall( xRow, yRow, startX, startY, enemyId ));
+              c.push(this.diagonall( true, xRow, yRow, startX, startY, enemyId ));
+
+              v.push(this.diagonall( false, xRow, yRow, startX, startY, enemyId ));
 
               var positionX = this.possible( xRow, startX );
               a.push(this.viable( positionX, yRow, botId, true ));
@@ -240,12 +243,10 @@
               b.push(this.viable( positionY, xRow, botId, false ));
 
             }
-            Print("xrows"+JSON.stringify(a)+"\n");
-            Print("yrows"+JSON.stringify(b)+"\n");
+
             out = [];
 
             //
-            //Print("c:"+JSON.stringify(c)+"\n");
             var cArr = [];
             for (var i = 0; i < c.length; i++) {
               cArr.push(c[i].length);
@@ -296,7 +297,24 @@
               }
             }
 
-            if(z === true || g === true || e === true){
+            //
+            var vArr = [];
+            for (var i = 0; i < v.length; i++) {
+              vArr.push(v[i].length);
+            }
+            //var sumF = vArr.reduce((a, b) => a + b, 0);
+            var f = vArr.includes(1, 1);
+            if(f){
+              Print("vArr:"+JSON.stringify(vArr)+"\n");
+              for(var i = 0; i < vArr.length; i++){
+                if(vArr[i] === 1){
+                  Print("w:"+JSON.stringify(v[i])+"\n");
+                  out.push(v[i][0]);
+                }
+              }
+            }
+
+            if( z === true || g === true || e === true || f === true ){
 
               Print("WIN WITH SINGLE\n");
               Print("WIN:"+JSON.stringify(out)+"\n");
@@ -306,12 +324,34 @@
               Print("WIN:"+JSON.stringify(c)+"\n");
               Print("WIN:"+JSON.stringify(a)+"\n");
               Print("WIN:"+JSON.stringify(b)+"\n");
+              Print("WIN:"+JSON.stringify(v)+"\n");
               //Print("b:"+JSON.stringify(sumG)+"\n");
+              buildgoodmoves = [];
               for(var i = 0; i < bArr.length; i++){
                 for(var x = 0; x < b[i].length; x++){
-                  Print("b:"+JSON.stringify(b[i][x])+"\n");
+                  buildgoodmoves.push(b[i][x]);
                 }
               };
+
+              for(var i = 0; i < aArr.length; i++){
+                for(var x = 0; x < a[i].length; x++){
+                  buildgoodmoves.push(a[i][x]);
+                }
+              };
+
+              for(var i = 0; i < cArr.length; i++){
+                for(var x = 0; x < c[i].length; x++){
+                  buildgoodmoves.push(c[i][x]);
+                }
+              };
+
+              for(var i = 0; i < vArr.length; i++){
+                for(var x = 0; x < v[i].length; x++){
+                  buildgoodmoves.push(v[i][x]);
+                }
+              };
+
+              Print("b:"+JSON.stringify(buildgoodmoves)+"\n");
 
             }
 
@@ -326,53 +366,58 @@
       return moves;
     };
 
-    Field.prototype.diagonall = function( xrow, yrow, startx, starty, enemyId ){
+    Field.prototype.diagonall = function( sw, xrow, yrow, startx, starty, enemyId ){
       otherPos = [];
       count = 0;
-      //if(xrow === yrow){
-        // for (var i = 0; i < 2; i++) {
-        //   var x = startx+i;
-        //   var y = starty+i;
-        //   if(xrow != x && yrow != y ){
-        //
-        //     if(this.board[x][y] === 0){
-        //       otherPos.push(new Move(x, y));
-        //     }else if(this.board[x][y] === enemyId){
-        //       count++;
-        //     }
-        //   }
-        // }
-      //}else{
 
-        // if( (xrow === startx) && (yrow === starty) ){
-        //
-        //   if(this.board[startx+1][starty+1] === 0){
-        //     otherPos.push(new Move(startx+1, starty+1));
-        //   }else if(this.board[startx+1][starty+1] === enemyId){
-        //     count++;
-        //   }
-        //
-        //   if(this.board[startx+2][starty+2] === 0){
-        //     otherPos.push(new Move(startx+2, starty+2));
-        //   }else if(this.board[startx+2][starty+2] === enemyId){
-        //     count++;
-        //   }
-        // }
-        //
-        // if( (xrow === startx+2) && (yrow === starty+2) ){
-        //
-        //   if(this.board[startx+1][starty+1] === 0){
-        //     otherPos.push(new Move(startx+1, starty+1));
-        //   }else if(this.board[startx+1][starty+1] === enemyId){
-        //     count++;
-        //   }
-        //
-        //   if(this.board[startx][starty] === 0){
-        //     otherPos.push(new Move(startx, starty));
-        //   }else if(this.board[startx][starty] === enemyId){
-        //     count++;
-        //   }
-        // }
+      if(sw){
+
+        if( (xrow === startx) && (yrow === starty) ){
+
+          if(this.board[startx+1][starty+1] === 0){
+            otherPos.push(new Move(startx+1, starty+1));
+          }else if(this.board[startx+1][starty+1] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx+2][starty+2] === 0){
+            otherPos.push(new Move(startx+2, starty+2));
+          }else if(this.board[startx+2][starty+2] === enemyId){
+            count++;
+          }
+        }
+
+        if( (xrow === startx+1) && (yrow === starty+1) ){
+
+          if(this.board[startx][starty] === 0){
+            otherPos.push(new Move(startx, starty));
+          }else if(this.board[startx][starty] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx+2][starty+2] === 0){
+            otherPos.push(new Move(startx+2, starty+2));
+          }else if(this.board[startx+2][starty+2] === enemyId){
+            count++;
+          }
+        }
+
+        if( (xrow === startx+2) && (yrow === starty+2) ){
+
+          if(this.board[startx+1][starty+1] === 0){
+            otherPos.push(new Move(startx+1, starty+1));
+          }else if(this.board[startx+1][starty+1] === enemyId){
+            count++;
+          }
+
+          if(this.board[startx][starty] === 0){
+            otherPos.push(new Move(startx, starty));
+          }else if(this.board[startx][starty] === enemyId){
+            count++;
+          }
+        }
+
+      }else{
 
         if( (xrow === startx+2) && (yrow === starty) ){
 
@@ -419,7 +464,7 @@
           }
         }
 
-      //}
+      }
 
       if(count === 0){
         return otherPos;
