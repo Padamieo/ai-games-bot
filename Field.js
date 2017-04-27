@@ -509,7 +509,7 @@
 
 
 
-
+    /*
     Field.prototype.diagonalCheck = function( array, id ){
       count = 0;
       ideal = [];
@@ -545,6 +545,7 @@
       }
       return (add/arr.length === arr[0][value] ? 1 : 0 );
     };
+    */
 
     Field.prototype.diff = function(a, b) {
       return b.filter(x => a.indexOf(x) == -1);
@@ -569,6 +570,7 @@
       return arr;
     };
 
+    /*
     Field.prototype.removeDuplicates = function(arr){
       var hash = {};
       var out = [];
@@ -661,7 +663,7 @@
       return  array;
     };
 
-
+    */
 
     Field.prototype.enemyId = function ( botId ) {
       return (botId === 2 ? 1 : 2);
