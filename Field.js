@@ -130,7 +130,13 @@
       }
     };
 
-
+    Field.prototype.buildArrayLengths = function( array ){
+      var arrayLengths = [];
+      for (var i = 0; i < array.length; i++) {
+        arrayLengths.push(array[i].length);
+      }
+      return arrayLengths;
+    };
 
     Field.prototype.getAvailableMoves = function ( botId ) {
 
@@ -247,10 +253,7 @@
             out = [];
 
             //
-            var cArr = [];
-            for (var i = 0; i < c.length; i++) {
-              cArr.push(c[i].length);
-            }
+            var cArr = this.buildArrayLengths( c );
             var sumZ = cArr.reduce((a, b) => a + b, 0);
             var z = cArr.includes(1, 1);
             if(z){
@@ -264,10 +267,7 @@
             }
 
             //
-            var aArr = [];
-            for (var i = 0; i < a.length; i++) {
-              aArr.push(a[i].length);
-            }
+            var aArr = this.buildArrayLengths( a );
             var sumE = aArr.reduce((a, b) => a + b, 0);
             var e = aArr.includes(1, 1);
             if(e){
@@ -281,10 +281,7 @@
             }
 
             //
-            var bArr = [];
-            for (var i = 0; i < b.length; i++) {
-              bArr.push(b[i].length);
-            }
+            var bArr = this.buildArrayLengths( b );
             var sumG = bArr.reduce((a, b) => a + b, 0);
             var g = bArr.includes(1, 1);
             if(g){
@@ -298,10 +295,7 @@
             }
 
             //
-            var vArr = [];
-            for (var i = 0; i < v.length; i++) {
-              vArr.push(v[i].length);
-            }
+            var vArr = this.buildArrayLengths( v );
             //var sumF = vArr.reduce((a, b) => a + b, 0);
             var f = vArr.includes(1, 1);
             if(f){
@@ -352,6 +346,9 @@
               };
 
               Print("b:"+JSON.stringify(buildgoodmoves)+"\n");
+              if(buildgoodmoves.length >= 1 ){
+                moves = buildgoodmoves;
+              }
 
             }
 
