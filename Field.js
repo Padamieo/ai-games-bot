@@ -209,7 +209,17 @@
         Print("num:"+loc.length+"\n");
 
         if(loc.length === 0 ){
+
           Print("no placment yet\n");
+          if(enemyloc.length === 1){
+            Print("single enemy placment\n");
+            //do we just place in center is avaliable
+          }else if(enemyloc.length >= 2){
+            Print("2 or more enemy placment\n");
+          }else{
+            Print("no enemy placment\n");
+          }
+
           // if(loc.length < 0){
           //
           //   locX = (loc[0].x-startX);
@@ -508,7 +518,6 @@
     };
 
 
-
     /*
     Field.prototype.diagonalCheck = function( array, id ){
       count = 0;
@@ -546,6 +555,7 @@
       return (add/arr.length === arr[0][value] ? 1 : 0 );
     };
     */
+
 
     Field.prototype.diff = function(a, b) {
       return b.filter(x => a.indexOf(x) == -1);
