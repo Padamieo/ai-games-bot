@@ -199,25 +199,33 @@
         if(moves.length === 9){
           //need to assess larger picture with risk
           Print("ANY\n");
-          // for (var i = moves.length - 1; i >= 0; i--) {
-          //   if(!(i % 2 === 0)){
-          //     moves.splice(i, 1);
-          //   }
-          // }
+          //moves = removeNoIdeals( moves );
         }
 
         Print("num:"+loc.length+"\n");
 
-        if(loc.length === 0 ){
+        if( loc.length === 0 ){
 
-          Print("no placment yet\n");
+          Print("no placement yet\n");
           if(enemyloc.length === 1){
-            Print("single enemy placment\n");
-            //do we just place in center is avaliable
-          }else if(enemyloc.length >= 2){
-            Print("2 or more enemy placment\n");
+            Print("single enemy placement\n");
+            //do we just place in center if its avaliable
+
+            var center = [{"x":startX+1,"y":startX+1}];
+            // Print(JSON.stringify(enemyloc)+"\n");
+            // Print(JSON.stringify(zz)+"\n");
+            if( JSON.stringify(enemyloc) != JSON.stringify(center) ){
+              //moves = center;
+              Print("SINGLE\n");
+            }
+
+          }else if( enemyloc.length >= 2 ){
+            Print("2 or more enemy placement\n");
           }else{
-            Print("no enemy placment\n");
+            Print("no enemy placement\n");
+            // may want to force emeny to place in no ideals,
+            // where as this will allow them to place in ideals
+            // moves = removeNoIdeals( moves );
           }
 
           // if(loc.length < 0){
@@ -323,13 +331,16 @@
               Print("WIN WITH SINGLE\n");
               Print("WIN:"+JSON.stringify(out)+"\n");
               moves = out;
+
             }else{
+
               Print("fallback\n");
               Print("WIN:"+JSON.stringify(c)+"\n");
               Print("WIN:"+JSON.stringify(a)+"\n");
               Print("WIN:"+JSON.stringify(b)+"\n");
               Print("WIN:"+JSON.stringify(v)+"\n");
               //Print("b:"+JSON.stringify(sumG)+"\n");
+
               buildgoodmoves = [];
               for(var i = 0; i < bArr.length; i++){
                 for(var x = 0; x < b[i].length; x++){
@@ -370,6 +381,18 @@
 
       }
 
+      return moves;
+    };
+
+    // not sure this is ideal, chooses x positions
+    Field.prototype.removeNoIdeals = function( moves ){
+      if(moves.length === 9){
+        for (var i = moves.length - 1; i >= 0; i--) {
+          if(!(i % 2 === 0)){
+            moves.splice(i, 1);
+          }
+        }
+      }
       return moves;
     };
 
