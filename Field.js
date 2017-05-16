@@ -211,16 +211,21 @@
             Print("single enemy placement\n");
             //do we just place in center if its avaliable
 
-            var center = [{"x":startX+1,"y":startX+1}];
+            var center = [{"x":startX+1,"y":startY+1}];
             // Print(JSON.stringify(enemyloc)+"\n");
-            // Print(JSON.stringify(zz)+"\n");
+            // Print(JSON.stringify(center)+"\n");
             if( JSON.stringify(enemyloc) != JSON.stringify(center) ){
-              //moves = center;
+              moves = center;
               Print("SINGLE\n");
             }
 
           }else if( enemyloc.length >= 2 ){
-            Print("2 or more enemy placement\n");
+            Print("2 or more enemy placements\n");
+            if( enemyloc.length === 2 ){
+              Print("2 placements\n");
+              var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId, botId  );
+              Print("output:"+JSON.stringify(tempProcess)+"\n");
+            }
           }else{
             Print("no enemy placement\n");
             // may want to force emeny to place in no ideals,
@@ -228,25 +233,13 @@
             // moves = removeNoIdeals( moves );
           }
 
-          // if(loc.length < 0){
-          //
-          //   locX = (loc[0].x-startX);
-          //   locY = (loc[0].y-startY);
-          //
-          //   placements = this.removeRequested( this.potentialPlacements( locX, locY ), locX, locY );
-          //
-          //   idealmoves = this.covertToMoves( placements, startX, startY );
-          //   var out = this.diff( moves, idealmoves );
-          //
-          //   moves = out;
-          // }
-
         }else{
 
           if(loc.length > 1 ){
             //Print("enemy:"+info[botId]+"\n");
             //Print("enemy:"+info[enemyId]+"\n");
             Print("loc:"+JSON.stringify(loc)+"\n");
+            /*
             var a = [];
             var b = [];
             var c = [];
@@ -267,64 +260,34 @@
               b.push(this.viable( positionY, xRow, botId, false ));
 
             }
+            */
+            var tempProcess = this.processMicro( loc, startX, startY, botId, enemyId  );
+            var a = tempProcess.a;
+            var b = tempProcess.b;
+            var c = tempProcess.c;
+            var v = tempProcess.v;
 
             out = [];
 
             //
-            var cArr = this.buildArrayLengths( c );
-            var sumZ = cArr.reduce((a, b) => a + b, 0);
-            var z = cArr.includes(1, 1);
-            if(z){
-              Print("cArr:"+JSON.stringify(cArr)+"\n");
-              for(var i = 0; i < cArr.length; i++){
-                if(cArr[i] === 1){
-                  Print("w:"+JSON.stringify(c[i])+"\n");
-                  out.push(c[i][0]);
-                }
-              }
-            }
+            var tempC = this.basicFindPatterns( c );
+            var z = tempC.matches;
+            var cArr = tempC.arrayLength;
 
             //
-            var aArr = this.buildArrayLengths( a );
-            var sumE = aArr.reduce((a, b) => a + b, 0);
-            var e = aArr.includes(1, 1);
-            if(e){
-              Print("aArr:"+JSON.stringify(aArr)+"\n");
-              for(var i = 0; i < aArr.length; i++){
-                if(aArr[i] === 1){
-                  Print("w:"+JSON.stringify(a[i])+"\n");
-                  out.push(a[i][0]);
-                }
-              }
-            }
+            var tempA = this.basicFindPatterns( a );
+            var e = tempA.matches;
+            var aArr = tempA.arrayLength;
 
             //
-            var bArr = this.buildArrayLengths( b );
-            var sumG = bArr.reduce((a, b) => a + b, 0);
-            var g = bArr.includes(1, 1);
-            if(g){
-              Print("bArr:"+JSON.stringify(bArr)+"\n");
-              for(var i = 0; i < bArr.length; i++){
-                if(bArr[i] === 1){
-                  Print("w:"+JSON.stringify(b[i])+"\n");
-                  out.push(b[i][0]);
-                }
-              }
-            }
+            var tempB = this.basicFindPatterns( b );
+            var g = tempB.matches;
+            var bArr = tempB.arrayLength;
 
             //
-            var vArr = this.buildArrayLengths( v );
-            //var sumF = vArr.reduce((a, b) => a + b, 0);
-            var f = vArr.includes(1, 1);
-            if(f){
-              Print("vArr:"+JSON.stringify(vArr)+"\n");
-              for(var i = 0; i < vArr.length; i++){
-                if(vArr[i] === 1){
-                  Print("w:"+JSON.stringify(v[i])+"\n");
-                  out.push(v[i][0]);
-                }
-              }
-            }
+            var tempV = this.basicFindPatterns( v );
+            var f = tempV.matches;
+            var vArr = tempV.arrayLength;
 
             if( z === true || g === true || e === true || f === true ){
 
@@ -378,10 +341,58 @@
 
         }
 
-
       }
 
       return moves;
+    };
+
+    Field.prototype.basicFindPatterns = function( a ){
+      var aArr = this.buildArrayLengths( a );
+      //var sumE = aArr.reduce((a, b) => a + b, 0);
+      var e = aArr.includes(1, 1);
+      if(e){
+        //Print("aArr:"+JSON.stringify(aArr)+"\n");
+        for(var i = 0; i < aArr.length; i++){
+          if(aArr[i] === 1){
+            //Print("w:"+JSON.stringify(a[i])+"\n");
+            out.push(a[i][0]);
+          }
+        }
+      }
+      return {
+        matches: e,
+        arrayLength: aArr
+      };
+      //[ e, aArr ];
+    };
+
+    Field.prototype.processMicro = function( loc, startX, startY, botId, enemyId ){
+      var a = [];
+      var b = [];
+      var c = [];
+      var v = [];
+      for (var i = 0; i < loc.length; i++) {
+
+        xRow = loc[i].x;
+        yRow = loc[i].y;
+
+        c.push(this.diagonall( true, xRow, yRow, startX, startY, enemyId ));
+
+        v.push(this.diagonall( false, xRow, yRow, startX, startY, enemyId ));
+
+        var positionX = this.possible( xRow, startX );
+        a.push(this.viable( positionX, yRow, botId, true ));
+
+        var positionY = this.possible( yRow, startY );
+        b.push(this.viable( positionY, xRow, botId, false ));
+
+      }
+      return {
+        a: a,
+        b: b,
+        c: c,
+        v: v
+      };
     };
 
     // not sure this is ideal, chooses x positions
@@ -539,164 +550,6 @@
       }
       return otherPos;
     };
-
-
-    /*
-    Field.prototype.diagonalCheck = function( array, id ){
-      count = 0;
-      ideal = [];
-      for (var i = 0; i < array.length; i++) {
-        var x = array[i][0];
-        var y = array[i][1];
-        if (this.board[x][y] === id) {
-          count++;
-        }else if (this.board[x][y] === 0) {
-          ideal.push(new Move(x, y));
-        }
-      }
-      return ideal;
-    };
-
-    Field.prototype.arrayMatch = function( arrA, arrB ) {
-      if(arrA.length !== arrB.length) return false;
-      var cA = arrA.slice().sort().join(",");
-      var cB = arrB.slice().sort().join(",");
-      return cA === cB;
-    };
-
-    Field.prototype.exists = function( arr, elem, value) {
-      return arr.some(function(el) {
-        return el[elem] === value;
-      });
-    };
-
-    Field.prototype.direction = function( arr, value) {
-      var add = 0;
-      for (var i = 0; i < arr.length; i++) {
-        add = add+arr[i][value];
-      }
-      return (add/arr.length === arr[0][value] ? 1 : 0 );
-    };
-    */
-
-
-    Field.prototype.diff = function(a, b) {
-      return b.filter(x => a.indexOf(x) == -1);
-    };
-
-    Field.prototype.covertToMoves = function( arr, startX, startY ){
-      array = [];
-      for (var i = 0; i < arr.length; i++) {
-        var x = arr[i][0]+startX;
-        var y = arr[i][1]+startY;
-        array.push(new Move( x, y ));
-      }
-      return array;
-    };
-
-    Field.prototype.removeRequested = function( arr, x, y ){
-      for (var i = arr.length - 1; i >= 0; i--) {
-        if(JSON.stringify(arr[i]) === JSON.stringify([x, y]) ) {
-          arr.splice(i, 1);
-        }
-      }
-      return arr;
-    };
-
-    /*
-    Field.prototype.removeDuplicates = function(arr){
-      var hash = {};
-      var out = [];
-      for (var i = 0, l = arr.length; i < l; i++) {
-        var key = arr[i].join('|');
-        if (!hash[key]) {
-          out.push(arr[i]);
-          hash[key] = 'found';
-        }
-      }
-      return out;
-    };
-
-    Field.prototype.potentialPlacements = function ( x, y ) {
-      var array = [];
-
-      //00, 01, 02
-      //10, 11, 12
-      //20, 21, 22
-
-      if(x === 1 && y === 1){
-        array.push([0,0]);
-        array.push([1,0]);
-        array.push([2,0]);
-        array.push([2,1]);
-        array.push([2,2]);
-        array.push([1,2]);
-        array.push([0,2]);
-        array.push([0,1]);
-      }else{
-        if(x === 0 || (x === 0 && y === 2) || (x === 0 && y === 1) ){
-          array.push([0,0]);
-          array.push([0,1]);
-          array.push([0,2]);
-        }
-
-        if(x === 0 && y === 1){
-          array.push([1,1]);
-          array.push([2,1]);
-        }
-
-        if((y === 0) || (x === 2 && y === 0) || (x === 1 && y === 0) ){
-          array.push([0,0]);
-          array.push([1,0]);
-          array.push([2,0]);
-        }
-
-        if(x === 1 && y === 0){
-          array.push([1,1]);
-          array.push([1,2]);
-        }
-
-        if((x === 0 && y === 0) || (x === 2 && y === 2)){
-          array.push([0,0]);
-          array.push([1,1]);
-          array.push([2,2]);
-        }
-
-        if((x === 2 && y === 0) || (x === 0 && y === 2)){
-          array.push([0,2]);
-          array.push([1,1]);
-          array.push([2,0]);
-        }
-
-        if( y === 2 || (x === 0 && y === 2) || (x === 1 && y === 2) ){
-          array.push([0,2]);
-          array.push([1,2]);
-          array.push([2,2]);
-        }
-
-        if(x === 1 && y === 2){
-          array.push([1,1]);
-          array.push([1,0]);
-        }
-
-        if (x === 2 || (x === 2 && y === 0)  || (x === 2 && y === 1)){
-          array.push([2,0]);
-          array.push([2,1]);
-          array.push([2,2]);
-        }
-
-        if(x === 2 && y === 1){
-          array.push([1,1]);
-          array.push([0,1]);
-        }
-      }
-
-      array = this.removeDuplicates(array);
-
-      return  array;
-    };
-
-    */
 
     Field.prototype.enemyId = function ( botId ) {
       return (botId === 2 ? 1 : 2);

@@ -4,7 +4,7 @@
   "dependencies": {
     "ultimatetictactoe-engine": "https://github.com/theaigames/ultimatetictactoe-engine.git",
     "tictactoe-starterbot-js": "http://theaigames.com/downloads/starterbots/tictactoe-starterbot-js.zip",
-    "ai-games-bot": "https://github.com/Padamieo/ai-games-bot.git#d5baf04291acb0799823598988fec7da0305b042"
+    "old": "https://github.com/Padamieo/ai-games-bot.git#c28f26c"
   },
   "private": true
 }
