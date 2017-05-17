@@ -94,36 +94,68 @@ module.exports = function(grunt){
 
   grunt.loadNpmTasks('grunt-contrib-compress');
 
-	// our default task, others will come later
+	// default task test our bot against older version of bot
 	grunt.registerTask("default", [
     "clean:log",
 		"shell:compare"
   ]);
 
-	grunt.registerTask('setup', [
-		"shell:setup"
-	]);
+  // tests against random placement bot
+  grunt.registerTask("random", [
+    "clean:log",
+    "shell:random"
+  ]);
 
-  grunt.registerTask('clear', [
-		"clean:log",
-    "clean:engineOut"
-	]);
-
+  // reverses default bot vs old bot player order
   grunt.registerTask('reverse', [
     "clean:log",
     "shell:reverse"
   ]);
 
+  // test against calums bot
   grunt.registerTask('calum', [
     "clean:log",
     "shell:calum"
   ]);
 
+  //need for setup on new machines, builds java ultimatetictactoe-engine
+	grunt.registerTask('setup', [
+		"shell:setup"
+	]);
+
+  //cleans up generate text files
+  grunt.registerTask('clear', [
+		"clean:log",
+    "clean:engineOut"
+	]);
+
+  // run a serise of matches and analyses results
 	grunt.registerTask('test', function(){
-		console.log("try something here");
-    console.log(thisUrl+pkg.compare);
+    matches = 100;
+    score = 0;
+    for (i = 0; i < matches; i++) {
+      grunt.task.run(['shell:compare']);
+      grunt.task.run(['analyse']);
+    };
+    grunt.task.run(['result']);
 	});
 
+  // reads out.txt results and adds up score
+  grunt.registerTask('analyse', function() {
+    var JFile = require('jfile');
+    var txtFile = new JFile('./bower_components/ultimatetictactoe-engine/out.txt');
+    var result = txtFile.grep("player1");
+    if(result.length != 0){
+      score = score + 1;
+    }
+  });
+
+  // displays final score in commandline
+  grunt.registerTask('result', function() {
+    console.log(score+'/'+matches);
+  });
+
+  // build the bot into a zip file ready for uploading
   grunt.registerTask('deploy', [
     "compress:main"
   ]);
