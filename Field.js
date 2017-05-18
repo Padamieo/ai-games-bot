@@ -239,55 +239,38 @@
             //Print("enemy:"+info[botId]+"\n");
             //Print("enemy:"+info[enemyId]+"\n");
             Print("loc:"+JSON.stringify(loc)+"\n");
-            /*
-            var a = [];
-            var b = [];
-            var c = [];
-            var v = [];
-            for (var i = 0; i < loc.length; i++) {
 
-              xRow = loc[i].x;
-              yRow = loc[i].y;
-
-              c.push(this.diagonall( true, xRow, yRow, startX, startY, enemyId ));
-
-              v.push(this.diagonall( false, xRow, yRow, startX, startY, enemyId ));
-
-              var positionX = this.possible( xRow, startX );
-              a.push(this.viable( positionX, yRow, botId, true ));
-
-              var positionY = this.possible( yRow, startY );
-              b.push(this.viable( positionY, xRow, botId, false ));
-
-            }
-            */
             var tempProcess = this.processMicro( loc, startX, startY, botId, enemyId  );
             var a = tempProcess.a;
             var b = tempProcess.b;
             var c = tempProcess.c;
             var v = tempProcess.v;
 
-            out = [];
+            var out = [];
 
             //
-            var tempC = this.basicFindPatterns( c );
-            var z = tempC.matches;
-            var cArr = tempC.arrayLength;
+            var tempC = this.basicFindPatterns( c, out );
+            var z = tempC.pattern;
+            var cArr = tempC.lengths;
+            out = tempC.out;
 
             //
-            var tempA = this.basicFindPatterns( a );
-            var e = tempA.matches;
-            var aArr = tempA.arrayLength;
+            var tempA = this.basicFindPatterns( a, out );
+            var e = tempA.pattern;
+            var aArr = tempA.lengths;
+            out = tempA.out;
 
             //
-            var tempB = this.basicFindPatterns( b );
-            var g = tempB.matches;
-            var bArr = tempB.arrayLength;
+            var tempB = this.basicFindPatterns( b, out );
+            var g = tempB.pattern;
+            var bArr = tempB.lengths;
+            out = tempB.out;
 
             //
-            var tempV = this.basicFindPatterns( v );
-            var f = tempV.matches;
-            var vArr = tempV.arrayLength;
+            var tempV = this.basicFindPatterns( v, out );
+            var f = tempV.pattern;
+            var vArr = tempV.lengths;
+            out = tempV.out;
 
             if( z === true || g === true || e === true || f === true ){
 
@@ -302,7 +285,6 @@
               Print("WIN:"+JSON.stringify(a)+"\n");
               Print("WIN:"+JSON.stringify(b)+"\n");
               Print("WIN:"+JSON.stringify(v)+"\n");
-              //Print("b:"+JSON.stringify(sumG)+"\n");
 
               buildgoodmoves = [];
               for(var i = 0; i < bArr.length; i++){
@@ -346,24 +328,22 @@
       return moves;
     };
 
-    Field.prototype.basicFindPatterns = function( a ){
-      var aArr = this.buildArrayLengths( a );
+    Field.prototype.basicFindPatterns = function( data, current_pass ){
+      var array_of_length = this.buildArrayLengths( data );
       //var sumE = aArr.reduce((a, b) => a + b, 0);
-      var e = aArr.includes(1, 1);
-      if(e){
-        //Print("aArr:"+JSON.stringify(aArr)+"\n");
-        for(var i = 0; i < aArr.length; i++){
-          if(aArr[i] === 1){
-            //Print("w:"+JSON.stringify(a[i])+"\n");
-            out.push(a[i][0]);
+      var pattern = array_of_length.includes( 1, 1 );
+      if( pattern ){
+        for(var i = 0; i < array_of_length.length; i++ ){
+          if( array_of_length[i] === 1 ){
+            current_pass.push( data[i][0] );
           }
         }
       }
       return {
-        matches: e,
-        arrayLength: aArr
+        pattern: pattern,
+        lengths: array_of_length,
+        out: current_pass
       };
-      //[ e, aArr ];
     };
 
     Field.prototype.processMicro = function( loc, startX, startY, botId, enemyId ){
