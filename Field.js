@@ -223,7 +223,12 @@
             Print("2 or more enemy placements\n");
             if( enemyloc.length === 2 ){
               Print("2 placements\n");
-              var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId, botId  );
+              var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId );
+              // var a = tempProcess.a;
+              // var b = tempProcess.b;
+              // var c = tempProcess.c;
+              // var v = tempProcess.v;
+
               Print("output:"+JSON.stringify(tempProcess)+"\n");
             }
           }else{
@@ -240,39 +245,39 @@
             //Print("enemy:"+info[enemyId]+"\n");
             Print("loc:"+JSON.stringify(loc)+"\n");
 
-            var tempProcess = this.processMicro( loc, startX, startY, botId, enemyId  );
+            var tempProcess = this.processMicro( loc, startX, startY, botId );
+            var h = tempProcess.h;
+            var v = tempProcess.v;
             var a = tempProcess.a;
             var b = tempProcess.b;
-            var c = tempProcess.c;
-            var v = tempProcess.v;
 
             var out = [];
 
             //
-            var tempC = this.basicFindPatterns( c, out );
-            var z = tempC.pattern;
-            var cArr = tempC.lengths;
-            out = tempC.out;
+            var tempH = this.basicFindPatterns( h, out );
+            var hp = tempH.pattern;
+            var hArr = tempH.lengths;
+            out = tempH.out;
+
+            //
+            var tempV = this.basicFindPatterns( v, out );
+            var vp = tempV.pattern;
+            var vArr = tempV.lengths;
+            out = tempV.out;
 
             //
             var tempA = this.basicFindPatterns( a, out );
-            var e = tempA.pattern;
+            var ap = tempA.pattern;
             var aArr = tempA.lengths;
             out = tempA.out;
 
             //
             var tempB = this.basicFindPatterns( b, out );
-            var g = tempB.pattern;
+            var bp = tempB.pattern;
             var bArr = tempB.lengths;
             out = tempB.out;
 
-            //
-            var tempV = this.basicFindPatterns( v, out );
-            var f = tempV.pattern;
-            var vArr = tempV.lengths;
-            out = tempV.out;
-
-            if( z === true || g === true || e === true || f === true ){
+            if( hp === true || vp === true || ap === true || bp === true ){
 
               Print("WIN WITH SINGLE\n");
               Print("WIN:"+JSON.stringify(out)+"\n");
@@ -281,27 +286,12 @@
             }else{
 
               Print("fallback\n");
-              Print("WIN:"+JSON.stringify(c)+"\n");
-              Print("WIN:"+JSON.stringify(a)+"\n");
-              Print("WIN:"+JSON.stringify(b)+"\n");
-              Print("WIN:"+JSON.stringify(v)+"\n");
 
               buildgoodmoves = [];
-              for(var i = 0; i < bArr.length; i++){
-                for(var x = 0; x < b[i].length; x++){
-                  buildgoodmoves.push(b[i][x]);
-                }
-              };
 
-              for(var i = 0; i < aArr.length; i++){
-                for(var x = 0; x < a[i].length; x++){
-                  buildgoodmoves.push(a[i][x]);
-                }
-              };
-
-              for(var i = 0; i < cArr.length; i++){
-                for(var x = 0; x < c[i].length; x++){
-                  buildgoodmoves.push(c[i][x]);
+              for(var i = 0; i < hArr.length; i++){
+                for(var x = 0; x < h[i].length; x++){
+                  buildgoodmoves.push(h[i][x]);
                 }
               };
 
@@ -311,7 +301,19 @@
                 }
               };
 
-              Print("b:"+JSON.stringify(buildgoodmoves)+"\n");
+              for(var i = 0; i < aArr.length; i++){
+                for(var x = 0; x < a[i].length; x++){
+                  buildgoodmoves.push(a[i][x]);
+                }
+              };
+
+              for(var i = 0; i < bArr.length; i++){
+                for(var x = 0; x < b[i].length; x++){
+                  buildgoodmoves.push(b[i][x]);
+                }
+              };
+
+              Print("buildgoodmoves:"+JSON.stringify(buildgoodmoves)+"\n");
               if(buildgoodmoves.length >= 1 ){
                 moves = buildgoodmoves;
               }
@@ -346,32 +348,33 @@
       };
     };
 
-    Field.prototype.processMicro = function( loc, startX, startY, botId, enemyId ){
+    Field.prototype.processMicro = function( location_array, startX, startY, id ){
+      var h = [];
+      var v = [];
       var a = [];
       var b = [];
-      var c = [];
-      var v = [];
-      for (var i = 0; i < loc.length; i++) {
+      var enemyId = parseInt(this.enemyId( id ), 10);
+      for (var i = 0; i < location_array.length; i++) {
 
-        xRow = loc[i].x;
-        yRow = loc[i].y;
+        var x = location_array[i].x;
+        var y = location_array[i].y;
 
-        c.push(this.diagonall( true, xRow, yRow, startX, startY, enemyId ));
+        a.push(this.diagonall( true, x, y, startX, startY, enemyId ));
 
-        v.push(this.diagonall( false, xRow, yRow, startX, startY, enemyId ));
+        b.push(this.diagonall( false, x, y, startX, startY, enemyId ));
 
-        var positionX = this.possible( xRow, startX );
-        a.push(this.viable( positionX, yRow, botId, true ));
+        var positionX = this.possible( x, startX );
+        h.push(this.viable( positionX, y, id, true ));
 
-        var positionY = this.possible( yRow, startY );
-        b.push(this.viable( positionY, xRow, botId, false ));
+        var positionY = this.possible( y, startY );
+        v.push(this.viable( positionY, x, id, false ));
 
       }
       return {
+        h: h,
+        v: v,
         a: a,
-        b: b,
-        c: c,
-        v: v
+        b: b
       };
     };
 
