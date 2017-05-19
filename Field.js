@@ -224,10 +224,33 @@
             if( enemyloc.length === 2 ){
               Print("2 placements\n");
               var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId );
-              // var a = tempProcess.a;
-              // var b = tempProcess.b;
-              // var c = tempProcess.c;
-              // var v = tempProcess.v;
+              var h = tempProcess.h;
+              var v = tempProcess.v;
+              var a = tempProcess.a;
+              var b = tempProcess.b;
+
+              var out = [];
+
+              var tempH = this.basicFindPatterns( h, out );
+              var hp = tempH.pattern;
+              out = tempH.out;
+
+              var tempV = this.basicFindPatterns( v, out );
+              var vp = tempV.pattern;
+              out = tempV.out;
+
+              var tempA = this.basicFindPatterns( a, out );
+              var ap = tempA.pattern;
+              out = tempA.out;
+
+              //
+              var tempB = this.basicFindPatterns( b, out );
+              var bp = tempB.pattern;
+              out = tempB.out;
+
+              if( hp === true || vp === true || ap === true || bp === true ){
+                Print("ENEMYWIN:"+JSON.stringify(out)+"\n");
+              }
 
               Print("output:"+JSON.stringify(tempProcess)+"\n");
             }
@@ -241,8 +264,7 @@
         }else{
 
           if(loc.length > 1 ){
-            //Print("enemy:"+info[botId]+"\n");
-            //Print("enemy:"+info[enemyId]+"\n");
+
             Print("loc:"+JSON.stringify(loc)+"\n");
 
             var tempProcess = this.processMicro( loc, startX, startY, botId );
@@ -289,29 +311,12 @@
 
               buildgoodmoves = [];
 
-              for(var i = 0; i < hArr.length; i++){
-                for(var x = 0; x < h[i].length; x++){
-                  buildgoodmoves.push(h[i][x]);
-                }
-              };
+              buildgoodmoves = this.processFallback( hArr, h, buildgoodmoves );
+              buildgoodmoves = this.processFallback( vArr, v, buildgoodmoves );
+              buildgoodmoves = this.processFallback( aArr, a, buildgoodmoves );
+              buildgoodmoves = this.processFallback( bArr, b, buildgoodmoves );
 
-              for(var i = 0; i < vArr.length; i++){
-                for(var x = 0; x < v[i].length; x++){
-                  buildgoodmoves.push(v[i][x]);
-                }
-              };
-
-              for(var i = 0; i < aArr.length; i++){
-                for(var x = 0; x < a[i].length; x++){
-                  buildgoodmoves.push(a[i][x]);
-                }
-              };
-
-              for(var i = 0; i < bArr.length; i++){
-                for(var x = 0; x < b[i].length; x++){
-                  buildgoodmoves.push(b[i][x]);
-                }
-              };
+              //need to have a look if enemy can win in single move
 
               Print("buildgoodmoves:"+JSON.stringify(buildgoodmoves)+"\n");
               if(buildgoodmoves.length >= 1 ){
@@ -346,6 +351,15 @@
         lengths: array_of_length,
         out: current_pass
       };
+    };
+
+    Field.prototype.processFallback = function( arr, results, passArray ){
+      for(var i = 0; i < arr.length; i++){
+        for(var x = 0; x < results[i].length; x++){
+          passArray.push( results[i][x] );
+        }
+      };
+      return passArray;
     };
 
     Field.prototype.processMicro = function( location_array, startX, startY, id ){
