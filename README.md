@@ -9,6 +9,10 @@ against old bot:
 (54, 47, 57)/100
 52.6/100
 
+added blocking enemy completes
+(58, 57, 64)/100
+59.66/100
+
 against random bot:
 (79,90)/100
 84.5/100

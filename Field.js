@@ -221,39 +221,39 @@
 
           }else if( enemyloc.length >= 2 ){
             Print("2 or more enemy placements\n");
-            if( enemyloc.length === 2 ){
-              Print("2 placements\n");
-              var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId );
-              var h = tempProcess.h;
-              var v = tempProcess.v;
-              var a = tempProcess.a;
-              var b = tempProcess.b;
 
-              var out = [];
+            var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId );
+            var h = tempProcess.h;
+            var v = tempProcess.v;
+            var a = tempProcess.a;
+            var b = tempProcess.b;
 
-              var tempH = this.basicFindPatterns( h, out );
-              var hp = tempH.pattern;
-              out = tempH.out;
+            var out = [];
 
-              var tempV = this.basicFindPatterns( v, out );
-              var vp = tempV.pattern;
-              out = tempV.out;
+            var tempH = this.basicFindPatterns( h, out );
+            var hp = tempH.pattern;
+            out = tempH.out;
 
-              var tempA = this.basicFindPatterns( a, out );
-              var ap = tempA.pattern;
-              out = tempA.out;
+            var tempV = this.basicFindPatterns( v, out );
+            var vp = tempV.pattern;
+            out = tempV.out;
 
-              //
-              var tempB = this.basicFindPatterns( b, out );
-              var bp = tempB.pattern;
-              out = tempB.out;
+            var tempA = this.basicFindPatterns( a, out );
+            var ap = tempA.pattern;
+            out = tempA.out;
 
-              if( hp === true || vp === true || ap === true || bp === true ){
-                Print("ENEMYWIN:"+JSON.stringify(out)+"\n");
-              }
+            //
+            var tempB = this.basicFindPatterns( b, out );
+            var bp = tempB.pattern;
+            out = tempB.out;
 
-              Print("output:"+JSON.stringify(tempProcess)+"\n");
+            if( hp === true || vp === true || ap === true || bp === true ){
+              Print("ENEMYWIN:"+JSON.stringify(out)+"\n");
+              moves = out;
             }
+
+            Print("output:"+JSON.stringify(tempProcess)+"\n");
+
           }else{
             Print("no enemy placement\n");
             // may want to force emeny to place in no ideals,
@@ -317,15 +317,71 @@
               buildgoodmoves = this.processFallback( bArr, b, buildgoodmoves );
 
               //need to have a look if enemy can win in single move
+              var tempProcess = this.processMicro( enemyloc, startX, startY, enemyId );
+              var h = tempProcess.h;
+              var v = tempProcess.v;
+              var a = tempProcess.a;
+              var b = tempProcess.b;
 
-              Print("buildgoodmoves:"+JSON.stringify(buildgoodmoves)+"\n");
-              if(buildgoodmoves.length >= 1 ){
-                moves = buildgoodmoves;
+              var out = [];
+
+              var tempH = this.basicFindPatterns( h, out );
+              var hp = tempH.pattern;
+              out = tempH.out;
+
+              var tempV = this.basicFindPatterns( v, out );
+              var vp = tempV.pattern;
+              out = tempV.out;
+
+              var tempA = this.basicFindPatterns( a, out );
+              var ap = tempA.pattern;
+              out = tempA.out;
+
+              //
+              var tempB = this.basicFindPatterns( b, out );
+              var bp = tempB.pattern;
+              out = tempB.out;
+
+              var fallback = true;
+              if( hp === true || vp === true || ap === true || bp === true ){
+
+                var arrr = [];
+                for (i = 0; i < buildgoodmoves.length; i++) {
+                  for (e = 0; e < out.length; e++) {
+                    xMatch = false;
+                    yMatch = false;
+                    if(buildgoodmoves[i].x == out[e].x){
+                      xMatch = true;
+                    }
+                    if(buildgoodmoves[i].y == out[e].y){
+                      yMatch = true;
+                    }
+                    if(xMatch == true && yMatch == true){
+                      arrr.push( buildgoodmoves[i] );
+                    }
+                  }
+                }
+
+                if(arrr.length >= 1){
+                  Print("arrr:"+JSON.stringify(arrr)+"\n");
+                  moves = arrr;
+                  fallback = false;
+                }else{
+                  fallback = true;
+                  // we know that enemy can complete in one move, but its position wont complete a line for us . . .
+                }
+
               }
+              //end of look at enemy
 
+              if(fallback){
+                Print("buildgoodmoves:"+JSON.stringify(buildgoodmoves)+"\n");
+                if(buildgoodmoves.length >= 1 ){
+                  moves = buildgoodmoves;
+                }
+              }
             }
-
-
+            
           }
 
         }
